@@ -16,8 +16,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
-library(tidyverse)
 library(shiny)
+library(tidyverse)
 library(usethis)
 library(devtools)
 library(rsconnect)

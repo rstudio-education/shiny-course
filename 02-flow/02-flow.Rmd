@@ -17,8 +17,7 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(shiny)
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 library(usethis)
 library(devtools)
 library(rsconnect)
