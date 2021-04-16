@@ -4,5 +4,10 @@
 .Ruserdata
 z_extra/
 rsconnect/
-*_cache/*
-*figure-html/*
+**/figure-html/*
+**/*_cache/*
+**/*_data/*
+01-hello/01-hello.html
+02-flow/02-flow.html
+03-reactivity/03-reactivity.html
+04-ui/04-ui.html
