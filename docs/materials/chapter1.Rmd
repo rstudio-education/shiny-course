@@ -1,0 +1,625 @@
+---
+title: Introduction and Shiny basics
+description: Architecture of a shiny app
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:53592995dc
+## Welcome to the course!
+
+01-01-welcome
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/000_placeholders/v1/hls-temp.master.m3u8
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:0d65e2ca2d
+## What's in an app?
+
+Which is not generally a part of the Shiny app architecture?
+
+*** =instructions
+- A function that installs an R package
+- User interface
+- Server function
+- A function that creates Shiny app objects
+
+*** =hint
+
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sct
+```{r}
+test_mc(1)
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:725a80bb52
+## First peek under the hood
+
+On the right you can see the complete code to reproduce the app we demoed in the previous video. Now you get to interact with the app yourself, and make small adjustments to it. 
+
+*** =instructions
+
+- Hit Submit Answer to run the code and generate the app.
+- Play with the input sliders and observe how the output changes.
+- Change the `selected` choice for the `y` input to `imdb_rating` and for the `x` input to `imdb_num_votes` and rerun the app.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies 
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions 
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "audience_score"),
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "critics_score")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:fbe44280e8
+## User interface
+
+01-02-ui
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/000_placeholders/v1/hls-temp.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:cf62e7bcf9
+## Extend the UI
+
+We'll start our learning with a simplified version of the app you saw in the previous exercise. In this app a `selectInput` widget is used to allow the user to select which variables should be plotted on the `x` and `y` axes of the scatterplot.
+
+The `selectInput` function has four arguments: an `inputId` that is used to refer to the input parameter when building the scatterplot, a list of `choices` to pick from, and a `selected` choice for when the app first launches. Note that `choices` takes a named vector, and the name rather than the value (which must match variable names in the data frame) is displayed to the user. 
+
+*** =instructions
+
+- Add a new `selectInput` widget to color the points by a choice of the following variables: `"title_type"`, `"genre"`, `"mpaa_rating"`, `"critics_rating"`, `"audience_rating"`.
+- Make the default selection `"mpaa_rating"`.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "___", 
+                  label = "____",
+                  choices = c(___),
+                  selected = "___")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = ___)) +
+      geom_point()
+  })
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("title_type", "genre", "mpaa_rating", "critics_rating", "audience_rating"),
+                  selected = "mpaa_rating")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+# mention the inputs 
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:b1565759ca
+## Extend the UI further
+
+The potential variables the user can select for the `x` and `y` axes and `color` currently appear in the UI of the app the same way that they are spelled in the data frame header. However we might want to label them in a way that is more human readable. We can achieve this using named vectors for the `choices` argument, in the format of `"Human readable label" = "variable_name"`.
+
+*** =instructions
+
+- Fill in the blanks with human readable labels for `x` and `y` inputs.
+- Re-create the `selectInput` widget for color, `z`, with options `"title_type"`, `"genre"`, `"mpaa_rating"`, `"critics_rating"`, and `"audience_rating"`, default selection `"mpaa_rating"` just like in the previous exercise, but this time use human readable labels as well.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c(___ = "imdb_rating", 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c(___ = "imdb_rating", 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(___)
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA rating" = "mpaa_rating", 
+                              "Critics rating" = "critics_rating", 
+                              "Audience rating" = "audience_rating"),
+                  selected = "mpaa_rating")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+# mention the inputs 
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:fc9afde4cc
+## Server function
+
+01-03-server
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/000_placeholders/v1/hls-temp.master.m3u8
+
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:54f615ba72
+## Rules of server functions
+
+Which of the following is not true about server functions?
+
+*** =instructions
+- Server functions should include a call to `runApp()`
+- Objects to be displayed should be saved to `output$`
+- Reactive objects should be built with `render*()` functions
+- Input values should be referred to with `input$`
+
+*** =hint
+
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sct
+```{r}
+test_mc(1)
+```
+
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:8197ac44a6
+## Fix it up
+
+On the right is the code for the Shiny app we built earlier, however currently the code is broken. Specifically there are errors in the definition of the server function as well as in the `mainPanel` of the UI.
+
+*** =instructions
+
+- Review the app and identify errors in the code
+- Fix the errors and test out the app
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA rating" = "mpaa_rating", 
+                              "Critics rating" = "critics_rating", 
+                              "Audience rating" = "audience_rating"),
+                  selected = "mpaa_rating")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterPlot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderTable({
+    ggplot(data = movies, aes_string(x = x, y = y,
+                                     color = z)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA rating" = "mpaa_rating", 
+                              "Critics rating" = "critics_rating", 
+                              "Audience rating" = "audience_rating"),
+                  selected = "mpaa_rating")
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create the scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+--- type:VideoExercise lang:r xp:50 skills:1 key:723aa768a4
+## Recap
+
+01-04-recap
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/000_placeholders/v1/hls-temp.master.m3u8
+
+
+
+

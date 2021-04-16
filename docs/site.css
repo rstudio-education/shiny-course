@@ -1,0 +1,640 @@
+/******
+tidymodels - adpated for shiny course
+*******/
+
+
+.title {
+  display: none;
+}
+
+.shiny-logo {
+  width: 50%; 
+  padding: 1em 3em; 
+  min-width: 300px;
+}
+
+.shiny-logo-image {
+  max-width: 100%; 
+  max-height: 250px; 
+  display: block; 
+  margin: 0 auto;
+}
+
+#TOC::before {
+  content: "";
+  display: none; /*change from block to none for landing page */
+  height: 250px;
+  margin: 10px 10px 40px 10px;
+  background-image: url("images/shiny.png");
+  background-size: contain;
+  background-position: top right;
+  background-repeat: no-repeat;
+}
+
+
+
+/*----------------ADDING WHITE SPACE-------------*/
+
+.title {
+  margin-top: 2em !important;
+  margin-bottom: 0.75em;
+}
+
+.section h1,
+.section h2, 
+.section h3, 
+.section h4, 
+.section h5 { 
+  padding-top: 3em !important; /*adding so much padding because theme adds a margin-top: -65px by default */
+  margin-bottom: 0.75em;
+}
+
+
+/* Space Between TOC and Righthand side content on large screens */
+
+@media (min-width: 992px) {
+  .col-md-9 {
+    width: 75%;
+    padding-left: 5em !important;
+  }
+}
+
+/* -----------HERO IMAGE AT TOP OF PAGE -----------*/
+
+/* LARGE HERO IMAGE AT TOP OF PAGE*/
+
+.hero-image {
+    position: relative;
+    /* liner gradient tints the image darker for readability*/
+    /*background-image: linear-gradient( rgba(0,0,0,.3), rgba(0,0,0,.3) ), url(images/hero-navy.jpg);*/
+    background-image: linear-gradient( rgba(41, 59, 156, .17), rgba(0, 188, 212, .25) ), url(images/hero-beige.jpg);
+    height: 400px;
+    background-size: cover;
+    background-color: #112d47;
+    background-position: center top;
+    display: flex; /* Change to `display: none` for no hero image */
+    justify-content: center;
+    align-items: center;
+}
+
+.small-text {
+  position: relative;
+  font-size: 34px;
+  padding-bottom: 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 2pt;
+  text-align: left;
+  display: block; /* Change to `display: none` for no top text */
+  color: #ffffff88;
+}
+
+.large-text {
+  position: relative;
+  letter-spacing: 0.06em;
+  line-height: 1em;
+  font-size: 60px;
+  text-transform: none;
+  text-align: left;
+  display: block; /* Change to `display: none` for no bottom text */
+  color: #ffffff;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+}  
+
+/*-----------------TOC----------------*/
+
+/* Makes TOC sticky (needed if you used a hero image) */
+
+.row-fluid{
+  display: flex; /* Necessary for sticky TOC*/
+
+}
+
+.tocify {
+  position: -webkit-sticky;
+  position: sticky; 
+  top: 100px; /*Controls where TOC stops when sticky */
+  width: 100% !important;
+  border: none;
+  text-transform: uppercase;
+}
+
+
+/* Tweak for mobile */
+
+@media screen and (max-width: 850px){
+  .shiny-logo {
+    margin-right: 1em;
+    margin-left: 1em;
+  }
+  
+  .large-text {
+    font-size: 50px;
+  }
+  
+}
+
+@media screen and (max-width: 767px){
+
+  .shiny-logo {
+    max-width: 250px !important;
+  }
+  
+  .wrap {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 80%;
+    margin: 0 auto;
+    padding-bottom: 1em;
+  }
+
+  .col-xs-12.col-sm-4.col-md-3 {
+    display: none;
+  }
+  
+  .small-text {
+    font-size: 25px;
+    text-align: center;
+  }
+
+  .large-text {
+    font-size: 40px;
+    text-align: center;
+  }
+  
+}
+
+
+@media screen and (max-width: 500px){
+  .shiny-logo-image {
+    max-width: 175px !important;
+  }
+  
+  .large-text {
+    font-size: 30px;
+  }
+  
+  .small-text {
+    font-size: 22px;
+  }
+  
+}
+
+/* TOC links */
+
+.list-group-item {
+    color:  #757373;
+    font-size: 16px;
+    letter-spacing: 1pt;
+}
+
+.list-group-item.active {
+    color: #112d47;
+    background-color: white;
+    border: none;
+}
+
+.list-group-item:hover, 
+.list-group-item.active:hover {
+    color: #112d4790;
+    background-color: white;
+}
+
+
+/*-------- Google font imports --------*/
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap');
+
+/* Navbar */
+
+.navbar-header {
+  padding-right: 15px !important;
+}
+
+.navbar {
+  box-shadow: none;
+  border-bottom: 1pt solid #cccccc66;
+}
+
+
+/*-------- Background color & body font --------*/
+
+body, button, input, textarea {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+
+body {
+  background-color: #ffffff;
+  color: #404040;
+  font-size: 19px;
+  line-height: 1.6em;
+}
+
+/*-------- White Space --------*/
+
+.band {
+  margin-top: 3em;
+}
+
+div.section {  /* so anchorized headers have breathing room above */
+  padding-top: 4em;
+  margin-top: -3em;
+}
+
+h2 {
+  margin-bottom: 1.1em;
+}
+
+h3 {
+  margin-bottom: 1em;
+}
+
+.sourceCode {
+  margin-top: 1.5em;
+}
+
+.topicsContainer {
+  margin-right: 3em; /* 4->3 for TM */
+}
+
+.topics {
+  margin-top: 3em;
+  padding-left: 4em;
+}
+
+
+/* Remove extra space on mobile */
+
+@media screen and (max-width: 767px) {
+
+  .band {
+    margin-top: 0;
+  }
+
+  div.section {
+    padding-top: 1em;
+    margin-top: -0.5em;
+  }
+
+  .topicsContainer{
+      width: 1%;
+      min-width: 1px;
+      margin-right: 0;
+  }
+
+  .topics {
+      padding-top: 1em;
+      width: 99% !important;
+      border-left: none !important;
+  }
+}
+
+
+/*-------- Content / Main Panel ---------*/
+
+.topics {
+    width: 75%;
+    overflow-x: auto;
+    padding-bottom: 600px;
+    background-color: white;
+    border-left: 1pt solid #cccccc66;
+}
+
+
+
+/*--------- Headers ---------*/
+
+h1, h2, h3 {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: normal;
+  letter-spacing: 1.5pt;
+}
+
+h1 {
+  color: #2e5d7b;
+}
+
+h2 {
+  font-size: 1.5em;
+  color: #2e5d7b; /*RStudio orange */
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.3em;
+  color: #2e5d7b; 
+  font-weight: 600;
+  text-transform: none;
+}
+
+h4 {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  color: #35262690;
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+}
+
+h5 {
+  font-family: 'Source Sans Pro', sans-serif;
+  color: #1a162d99;
+  text-transform: none;
+}
+
+h2 code,
+h3 code {
+  text-transform: none;
+  font-size: 100%;
+  background-color: #e8e8e830;
+}
+
+
+/* Side Panel Start Over Button */
+
+.topicsFooter .resetButton {
+  display: block;
+  max-width: 41%;
+  padding: 8px 10px;
+  /* background-color: #eab0c46b; */
+  border: solid 1pt #757373;
+  color: #757373;
+  font-size: 12px;
+  letter-spacing: 1pt;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  margin: 0 auto;
+  margin-top: 1em;
+  border-radius: 3px;
+  opacity: 1;
+}
+
+.topicsFooter .resetButton:hover {
+  border: solid 1pt #2e5d7b;
+  color: #2e5d7b;
+}
+
+
+
+/*------- In line code aesthetic --------*/
+code {
+  color: #575757;
+  background-color: #4040400f;
+
+}
+
+code.sourceCode {
+  white-space: pre-wrap;
+}
+
+/*------- Hyperlinks --------*/
+
+a,
+a:hover,
+a:focus {
+  color: #2e5d7b;
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/*------- Sidebar/Main Menu -------*/
+
+/*--Title--*/
+
+h2.tutorialTitle,
+.topicsHeader h2.tutorialTitle {
+  font-size: 1.7em;
+  font-weight: 400;
+  color: #112d47; /*navy */
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+  margin-bottom: 0.9em;
+}
+
+/*--Name, Date etc.--*/
+
+#doc-metadata {
+  margin-bottom: 1.5em;
+  padding-bottom: 1.5em;
+  border-bottom: solid 1pt #cccccc68;
+}
+
+#doc-metadata h3,
+#doc-metadata h4 {
+  text-transform: uppercase;
+  letter-spacing: 2pt;
+  line-height: 1.6em;
+}
+
+#doc-metadata h3.subtitle {
+  font-size: 0.8em;
+  color: #40404099;
+  font-weight: normal;
+  letter-spacing: 1pt;
+}
+
+.topicsContainer {
+}
+
+/* sidebar item */
+
+.topicsList .topic {
+  color: #757373;
+  font-size: 15px;
+  letter-spacing: 1pt;
+  line-height: 1.25em;
+  padding: 0.75em 0;
+  background-image: none;
+  /*border-left: 2px solid white;*/
+  border-bottom: none;
+}
+
+/*--- When hovering ---*/
+
+.topicsList .topic:hover {
+    background-color: white;
+    color: #040100;
+    /* border-left: 2px solid #00008040;*/
+}
+
+/*------- Selected menu item -------*/
+
+.topicsList .topic.current {
+    background-color: white;
+    color: #040100;
+    /*border-left: 2px solid #000080;*/
+}
+
+/* CODE WINDOWS */
+
+/*------- Solution / Hint buttons -------*/
+.tutorial-exercise-input .btn-tutorial-solution {
+    margin-left: 15px;
+    background-color: #bd2a62;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    border: 0;
+    text-shadow: none;
+}
+
+/*------- Solution popover --------*/
+.popover-title {
+    margin: 0;
+    padding: 8px 14px;
+    font-size: 14px;
+    background-color: #bd2a62;
+    border-bottom: 1px solid #ebebeb;
+    border-radius: 5px 5px 0 0;
+    color: white;
+    text-shadow: none;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+/*------- BUTTONS -------*/
+
+.btn {
+  border-radius: 3px;
+}
+
+.topicActions .btn-primary,
+.topicActions .btn-success,
+.topicActions .btn-info,
+.topicActions .btn-xs,
+.topicActions .btn-default {
+    background-image: none;
+    border: 0;
+    text-shadow: none;
+    letter-spacing: 1pt;
+}
+
+.topicActions .btn-primary,
+.topicActions .btn-primary:active,
+.topicActions .btn-primary:focus {
+  color: white;
+  background-color: #000080;
+}
+
+.btn:focus {
+outline-offset: 0;
+}
+
+/*------- Buttons when hovering -------*/
+
+.topicActions .btn-default:hover,
+.topicActions .btn-primary:hover {
+  background-color: #00008080;
+  color: white;
+}
+
+
+
+
+/*-------Colored Bullets-------*/
+
+.section ul {
+  list-style: none; /* Remove default bullets */
+}
+
+.section ul li::before {
+    content: "\2022";
+    color: #112d47;
+    display: inline-block;
+    position: relative;
+    left: 1em;
+    top: 0.2rem;
+    font-size: 1.6em;
+    line-height: 1;
+    width: 2em;
+    margin-left: -2em;/* Also needed for space (tweak if needed) */
+}
+
+.section ul > li > p {
+  display: inline; /* to have content show up next to bullet */
+}
+
+.section ul > li { /*to add back in space between bullet items that I took away by making p display inline */
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* RStudio Cloud Project Buttons */
+
+.test-drive {
+  background-color: #75aadb;
+  color: #fcfcfc;
+  border: 1pt solid #75aadb;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 auto 1.5em auto;
+  border-radius: 3px;
+  display: block;
+  width: 45%;
+  white-space: pre-wrap;
+}
+
+.test-drive p {
+  margin: 0;
+}
+
+/* Darker background on mouse-over */
+.test-drive:hover {
+  background-color: #4e80af;
+  border: 1pt solid #75aadb;
+}
+  
+.test-drive a:hover{
+  text-decoration: none;
+}
+
+.proj {
+  background-color: #75aadb10;
+  border: #75aadb50 solid 1px;
+  color: #306aa0;
+  padding: 1em;
+  width: 100%;
+  margin: 1em auto 0.5em;
+  text-align: center;
+}
+
+.proj {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* Copy to Clipboard */
+
+.copy {
+  width: inherit;
+  background-color: #112d47 ;
+  border: none;
+  border-radius: 2px;
+  float: right;
+  font-size: 60%;
+  padding: 4px 4px 4px 4px;
+}
+
+/* pkgdown clipboard */
+
+.hasCopyButton {
+  position: relative;
+}
+
+.btn-copy-ex {
+  position: absolute;
+  right: 0;
+  top: 0;
+  visibility: hidden;
+}
+
+.hasCopyButton:hover button.btn-copy-ex {
+  visibility: visible;
+}
+

@@ -1,0 +1,22 @@
+name: "shiny course"
+output_dir: "docs"
+navbar:
+  title: " "
+  left:
+    - icon: fa-home
+      href: index.html
+  right:
+    - text: "Module 1"
+      href: 01-hello/01-hello.html
+    - text: "Module 2"
+      href: 02-flow/02-flow.html.html
+    - text: "Module 3"
+      href: 03-reactivity/03-reactivity.html
+    - text: "Module 4"
+      href: 04-ui/04-ui.html
+output: 
+  html_document: 
+    theme: paper
+    inverse: true
+    css: site.css
+

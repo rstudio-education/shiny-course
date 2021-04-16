@@ -1,0 +1,18 @@
+- dynamic UI -- inputs getting created in the server -- so just mention "as long as you're not dealing with dynamic UI, then inputs get defined in the UI..."
+- add a dynamic UI exercise to chp 2 -- last exercise.
+- MENTION IN THE VIDEO: render* functions and reactives -- always use ({ })
+	- consistency
+	- helps with debugging
+- Mention in reactives video that they are lazy, if you call a reactive object multiple times in the server, it's not rerun multiple times, only reruns when the inputs change (what makes it different from a normal function)
+	- observers are the opposite
+- reactiveValues exercise to be written -- contrast with reactiveVal, see 
+	- https://stackoverflow.com/questions/39436713/r-shiny-reactivevalues-vs-reactive/39440482#39440482
+	- https://github.com/rstudio/shiny/issues/1496
+- Consider switching exercises following stop-trigger-delay with reacriveValues + observers
+
+- Last recap video on reactivity flash a screenshot of the reactive programming part of reference, highlight the ones we talked about and say go read about the rest...
+- Reactivity recap video -- taking not repeating yourself to the next step is using modules. If app is in package you can document functions directly as well.
+
+- Take out CSS stuff -> 
+	- maybe add one more ex with shinyThemes
+	- maybe add modals

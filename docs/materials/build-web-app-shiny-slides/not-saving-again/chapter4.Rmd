@@ -1,0 +1,3718 @@
+---
+title: Customizing appearance
+description: ''
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:6ea0da9f22
+## Interface builder functions
+
+Demo a few of the simpler interface builder options with HTML code
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch4_1.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:74f15f391f
+## Add text with HTML tags in the main panel
+
+The following app does a bunch of things: allows users to customize the plot, subsets and samples the data, and reports simple summary statistics and displays the data table. Use HTML tags to add headers and visual separators to make it a bit more clear, at a first glance, what's happening in the app.
+
+*** =instructions
+
+- Add third level headers with `h3()`. See the comments in the sample code for the text of the headers.
+- Add visual separation with horizontal lines (`hr()`) and (`br()`) where indicated.
+- Make the text reporting the number of movies a fourth level header with `h4()`.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      ___      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      ___      # Horizontal line for visual separation
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      ___      # Horizontal line for visual separation
+      
+      ___      # Thid level header: Sampling and subsetting
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      ___      # Horizontal line for visual separation
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE)
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      ___          # Third level header: Scatterplot
+      plotOutput(outputId = "scatterplot"),
+      ___          # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      uiOutput(outputId = "n"),    # Fourth level header
+      ___          # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      ___          # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE)
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+success_msg("Great job! Does it bother you that 'Data table' shows up even when box is unchecked? We'll get to that in a bit...")
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:98de7f6453
+## Add image with img tag
+
+Images can engance the appearance of your app, and you can add images to a Shiny app with the `img()` tag.
+
+*** =instructions
+
+- Underneath the sidebar panel of the app, add a text that says "Built with Shiny by RStudio.".
+- Instead of the word "Shiny" use the hex logo at https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png specifying a height of 30px.
+- Instead of the word "RStudio" use the logo at https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png specifying a height of 30px as well.
+- Format this text as a fifth level header.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+                    
+      # Built with Shiny by RStudio
+      ___    # Two line breaks for visual separation
+      ___("Built with",
+      img(src = "___", height = "___"),
+      "by",
+      ___
+      ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      # Built with Shiny by RStudio
+      br(), br(),
+      h5("Built with",
+      img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+      "by",
+      img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+      ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:19d1823e6b
+## Layout panels
+
+sidebarPanel(), mainPanel(), titlePanel(), conditionalPanel()
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch4_2.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:4b74aa1cb1
+## Organize the sidebar with wellPanels
+
+`wellPanel()`s are useful for grouping related UI widgets into one.
+
+*** =instructions
+
+- Place all UI widgets under the heading "Plotting" into one `wellPanel()`.
+- Place all UI widgets under the heading "Subsetting and sampling" into another `wellPanel()`.
+- Place the checkbox input widget for showing/hiding the data tile into yet another `wellPanel()`.
+- Remove additional breaks and horizontal lines separating these three groups.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),                # Horizontal line for visual separation
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      # Built with Shiny by RStudio
+      br(), br(),
+      h5("Built with",
+      img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+      "by",
+      img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+      ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      wellPanel(
+        h3("Plottting"),      # Thid level header: Plotting
+        
+        # Select variable for y-axis 
+        selectInput(inputId = "y", 
+                    label = "Y-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "audience_score"),
+        
+        # Select variable for x-axis 
+        selectInput(inputId = "x", 
+                    label = "X-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "critics_score"),
+        
+        # Select variable for color
+        selectInput(inputId = "z", 
+                    label = "Color by:",
+                    choices = c("Title Type" = "title_type", 
+                                "Genre" = "genre", 
+                                "MPAA Rating" = "mpaa_rating", 
+                                "Critics Rating" = "critics_rating", 
+                                "Audience Rating" = "audience_rating"),
+                    selected = "mpaa_rating"),
+        
+        hr(),
+        
+        # Set alpha level
+        sliderInput(inputId = "alpha", 
+                    label = "Alpha:", 
+                    min = 0, max = 1, 
+                    value = 0.5),
+        
+        # Set point size
+        sliderInput(inputId = "size", 
+                    label = "Size:", 
+                    min = 0, max = 5, 
+                    value = 2),
+        
+        # Enter text for plot title
+        textInput(inputId = "plot_title", 
+                  label = "Plot title", 
+                  placeholder = "Enter text to be used as plot title")
+        
+      ),
+      
+      wellPanel(
+        # Header
+        h3("Subsetting and sampling"),
+        
+        # Select which types of movies to plot
+        checkboxGroupInput(inputId = "selected_type",
+                           label = "Select movie type(s):",
+                           choices = c("Documentary", "Feature Film", "TV Movie"),
+                           selected = "Feature Film"),
+        
+        # Select sample size
+        numericInput(inputId = "n_samp", 
+                     label = "Sample size:", 
+                     min = 1, max = nrow(movies), 
+                     value = 50)        
+      ),
+
+      wellPanel(
+        # Show data table
+        checkboxInput(inputId = "show_data",
+                      label = "Show data table",
+                      value = TRUE)
+      ),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:655064cc38
+## Further customize panels
+
+Giving your app a title can quickly communicate what it does, and depending on how your app is structured, you might consider adjusting the width of your sidebar and main panels.
+
+*** =instructions
+
+- Add a title to your app, and a shorter title as the `windowTitle` argument.
+- Increase the sidebar panel width by one and accordingly adjust the main panel width.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      wellPanel(
+        h3("Plottting"),      # Thid level header: Plotting
+        
+        # Select variable for y-axis 
+        selectInput(inputId = "y", 
+                    label = "Y-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "audience_score"),
+        
+        # Select variable for x-axis 
+        selectInput(inputId = "x", 
+                    label = "X-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "critics_score"),
+        
+        # Select variable for color
+        selectInput(inputId = "z", 
+                    label = "Color by:",
+                    choices = c("Title Type" = "title_type", 
+                                "Genre" = "genre", 
+                                "MPAA Rating" = "mpaa_rating", 
+                                "Critics Rating" = "critics_rating", 
+                                "Audience Rating" = "audience_rating"),
+                    selected = "mpaa_rating"),
+        
+        hr(),
+        
+        # Set alpha level
+        sliderInput(inputId = "alpha", 
+                    label = "Alpha:", 
+                    min = 0, max = 1, 
+                    value = 0.5),
+        
+        # Set point size
+        sliderInput(inputId = "size", 
+                    label = "Size:", 
+                    min = 0, max = 5, 
+                    value = 2),
+        
+        # Enter text for plot title
+        textInput(inputId = "plot_title", 
+                  label = "Plot title", 
+                  placeholder = "Enter text to be used as plot title")
+        
+      ),
+      
+      wellPanel(
+        # Header
+        h3("Subsetting and sampling"),
+        
+        # Select which types of movies to plot
+        checkboxGroupInput(inputId = "selected_type",
+                           label = "Select movie type(s):",
+                           choices = c("Documentary", "Feature Film", "TV Movie"),
+                           selected = "Feature Film"),
+        
+        # Select sample size
+        numericInput(inputId = "n_samp", 
+                     label = "Sample size:", 
+                     min = 1, max = nrow(movies), 
+                     value = 50)        
+      ),
+
+      wellPanel(
+        # Show data table
+        checkboxInput(inputId = "show_data",
+                      label = "Show data table",
+                      value = TRUE)
+      ),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+
+  # App title
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+    
+      wellPanel(
+        h3("Plottting"),      # Thid level header: Plotting
+        
+        # Select variable for y-axis 
+        selectInput(inputId = "y", 
+                    label = "Y-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "audience_score"),
+        
+        # Select variable for x-axis 
+        selectInput(inputId = "x", 
+                    label = "X-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "critics_score"),
+        
+        # Select variable for color
+        selectInput(inputId = "z", 
+                    label = "Color by:",
+                    choices = c("Title Type" = "title_type", 
+                                "Genre" = "genre", 
+                                "MPAA Rating" = "mpaa_rating", 
+                                "Critics Rating" = "critics_rating", 
+                                "Audience Rating" = "audience_rating"),
+                    selected = "mpaa_rating"),
+        
+        hr(),
+        
+        # Set alpha level
+        sliderInput(inputId = "alpha", 
+                    label = "Alpha:", 
+                    min = 0, max = 1, 
+                    value = 0.5),
+        
+        # Set point size
+        sliderInput(inputId = "size", 
+                    label = "Size:", 
+                    min = 0, max = 5, 
+                    value = 2),
+        
+        # Enter text for plot title
+        textInput(inputId = "plot_title", 
+                  label = "Plot title", 
+                  placeholder = "Enter text to be used as plot title")
+        
+      ),
+      
+      wellPanel(
+        # Header
+        h3("Subsetting and sampling"),
+        
+        # Select which types of movies to plot
+        checkboxGroupInput(inputId = "selected_type",
+                           label = "Select movie type(s):",
+                           choices = c("Documentary", "Feature Film", "TV Movie"),
+                           selected = "Feature Film"),
+        
+        # Select sample size
+        numericInput(inputId = "n_samp", 
+                     label = "Sample size:", 
+                     min = 1, max = nrow(movies), 
+                     value = 50)        
+      ),
+      
+      wellPanel(
+        # Show data table
+        checkboxInput(inputId = "show_data",
+                      label = "Show data table",
+                      value = TRUE)
+      ),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         "."),
+      
+      width = 5
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable"),
+      
+      width = 7
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:6dd3650aea
+## Add a conditional panel
+
+The app we've been working with has a checkbox input that the user can use to display/hide the data table. However the heading "Data table" is displayed on the app regardless of whether the table is displayed or not. We can fix this with a `conditionalPanel()`.
+
+*** =instructions
+
+- Put the "Data table" heading in a `conditionalPanel`.
+- The first argument in this function is the `condition`, which is a JavaScript expression that will be evaluated repeatedly to determine whether the panel should be displayed. The condition in R would be stated as `if(input.show_data == TRUE)`, however in JavaScript we use `true`.
+- The second argument is the element to be displayed.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+    
+      wellPanel(
+        h3("Plottting"),      # Thid level header: Plotting
+        
+        # Select variable for y-axis 
+        selectInput(inputId = "y", 
+                    label = "Y-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "audience_score"),
+        
+        # Select variable for x-axis 
+        selectInput(inputId = "x", 
+                    label = "X-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "critics_score"),
+        
+        # Select variable for color
+        selectInput(inputId = "z", 
+                    label = "Color by:",
+                    choices = c("Title Type" = "title_type", 
+                                "Genre" = "genre", 
+                                "MPAA Rating" = "mpaa_rating", 
+                                "Critics Rating" = "critics_rating", 
+                                "Audience Rating" = "audience_rating"),
+                    selected = "mpaa_rating"),
+        
+        hr(),
+        
+        # Set alpha level
+        sliderInput(inputId = "alpha", 
+                    label = "Alpha:", 
+                    min = 0, max = 1, 
+                    value = 0.5),
+        
+        # Set point size
+        sliderInput(inputId = "size", 
+                    label = "Size:", 
+                    min = 0, max = 5, 
+                    value = 2),
+        
+        # Enter text for plot title
+        textInput(inputId = "plot_title", 
+                  label = "Plot title", 
+                  placeholder = "Enter text to be used as plot title")
+        
+      ),
+      
+      wellPanel(
+        # Header
+        h3("Subsetting and sampling"),
+        
+        # Select which types of movies to plot
+        checkboxGroupInput(inputId = "selected_type",
+                           label = "Select movie type(s):",
+                           choices = c("Documentary", "Feature Film", "TV Movie"),
+                           selected = "Feature Film"),
+        
+        # Select sample size
+        numericInput(inputId = "n_samp", 
+                     label = "Sample size:", 
+                     min = 1, max = nrow(movies), 
+                     value = 50)        
+      ),
+      
+      wellPanel(
+        # Show data table
+        checkboxInput(inputId = "show_data",
+                      label = "Show data table",
+                      value = TRUE)
+      ),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         "."),
+      
+      width = 5
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable"),
+      
+      width = 7
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+    
+      wellPanel(
+        h3("Plottting"),      # Thid level header: Plotting
+        
+        # Select variable for y-axis 
+        selectInput(inputId = "y", 
+                    label = "Y-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "audience_score"),
+        
+        # Select variable for x-axis 
+        selectInput(inputId = "x", 
+                    label = "X-axis:",
+                    choices = c("IMDB rating" = "imdb_rating", 
+                                "IMDB number of votes" = "imdb_num_votes", 
+                                "Critics Score" = "critics_score", 
+                                "Audience Score" = "audience_score", 
+                                "Runtime" = "runtime"), 
+                    selected = "critics_score"),
+        
+        # Select variable for color
+        selectInput(inputId = "z", 
+                    label = "Color by:",
+                    choices = c("Title Type" = "title_type", 
+                                "Genre" = "genre", 
+                                "MPAA Rating" = "mpaa_rating", 
+                                "Critics Rating" = "critics_rating", 
+                                "Audience Rating" = "audience_rating"),
+                    selected = "mpaa_rating"),
+        
+        hr(),
+        
+        # Set alpha level
+        sliderInput(inputId = "alpha", 
+                    label = "Alpha:", 
+                    min = 0, max = 1, 
+                    value = 0.5),
+        
+        # Set point size
+        sliderInput(inputId = "size", 
+                    label = "Size:", 
+                    min = 0, max = 5, 
+                    value = 2),
+        
+        # Enter text for plot title
+        textInput(inputId = "plot_title", 
+                  label = "Plot title", 
+                  placeholder = "Enter text to be used as plot title")
+        
+      ),
+      
+      wellPanel(
+        # Header
+        h3("Subsetting and sampling"),
+        
+        # Select which types of movies to plot
+        checkboxGroupInput(inputId = "selected_type",
+                           label = "Select movie type(s):",
+                           choices = c("Documentary", "Feature Film", "TV Movie"),
+                           selected = "Feature Film"),
+        
+        # Select sample size
+        numericInput(inputId = "n_samp", 
+                     label = "Sample size:", 
+                     min = 1, max = nrow(movies), 
+                     value = 50)        
+      ),
+      
+      wellPanel(
+        # Show data table
+        checkboxInput(inputId = "show_data",
+                      label = "Show data table",
+                      value = TRUE)
+      ),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         "."),
+      
+      width = 5
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      conditionalPanel(condition = "input.show_data == true", h3("Data table")),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable"),
+      
+      width = 7
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  }
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:45fac2beba
+## Tabs and tabset panels
+
+Distributing contents across tabs with tabPanel() and tabsetPanel()
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch4_3.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:54691fb979
+## Reorganize your app with tabs
+
+The app that we have been working with got pretty complex. We can organize the outputs a bit better using tabs.
+
+*** =instructions
+
+- Reorganize your app into two tabs
+- Tab 1 should be called "Plot" and should contain the scatterplot and the text for number of observations, separated by a line break.
+- Tab 2 should be called "Data" and should contain the data table. Use a line break on top to place the table a little below the top of the tab.
+- Remove the third level headings above each of these components, since the tab titles serve the same purpose.
+
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      # Show scatterplot
+      h3("Scatterplot"),    # Horizontal line for visual separation
+      plotOutput(outputId = "scatterplot"),
+      br(),                 # Single line break for a little bit of visual separation
+      
+      # Print number of obs plotted
+      h4(uiOutput(outputId = "n")),
+      br(), br(),           # Two line breaks for a little bit of visual separation
+      
+      # Show data table
+      h3("Data table"),     # Third level header: Data table
+      DT::dataTableOutput(outputId = "moviestable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable"))
+      )
+      
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Print data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:8e7129f5e1
+## Add a new tab with the codebook
+
+Given that the users get to choose which variables to plot, it might be a good idea to provide a codebook along with the app so that they can refer to it to make their selection. We can put this information in a new tab.
+
+*** =instructions
+
+- Load the file called `movies_codebook.csv` at [this link](http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv). This file has three columns: Column, Variable name, and Description.
+- In the UI: Add a new tab titled "Codebook" that uses the `dataTableOutput` function from the `DT` package to display the codebook.
+- In the server: Render the table with the following options: `pagelength = 10`, `lengthMenu = c(10, 25, 40))`, and `rownames = FALSE`.
+
+*** =hint
+
+Refer to how `output$moviestable` is rendered and displayed for hints.
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable"))
+                  # New tab panel for Codebook
+                  ___
+      )
+      
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Render data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  # Render data table for codebook
+  ___
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable")),
+                  # New tab panel for Codebook
+                  tabPanel("Codebook", 
+                           br(),
+                           DT::dataTableOutput("codebook"))
+                  
+      )
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Render data table if checked
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  # Render data table for codebook
+  output$codebook <- DT::renderDataTable({
+    DT::datatable(data = movies_codebook,
+                  options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+                  rownames = FALSE)
+  })
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:77f5943403
+## Create new conditional tab for displaying data table
+
+Remember earlier we used a conditional panel to display/hide the heading "Data table" depending on whether the "Show data table" checkbox input was selected? We might want to do something similar with the "Data" tab now. And we can achieve this using conditional tabs, via the `showTab()` and `hideTab()` functions.
+
+*** =instructions
+
+- In the UI: Add an id argument to `tabsPanel`. This is a text string, you can use whatever you like, we suggest `"tabspanel"`.
+- In the server: Update how `output$movies_table` is calculated so that it is calculated regardless of the current state of `input$show_data`, i.e. regardless of whether the box is checked or not.
+- In the server: Add an `observeEvent` handler in the server that depends on the `show_data` input and that shows the `"Data"` tab if `show_data` is `TRUE` and hides it if it's `FALSE`. See the fill in the blanks spaces in the sample code as well as the function documentation for `showTab()` and `hideTab()` functions. Also, in the `showTab()` function, set up the tab so that it is selected when `show_data` is `TRUE`. 
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable")),
+                  # New tab panel for Codebook
+                  tabPanel("Codebook", 
+                           br(),
+                           DT::dataTableOutput("codebook"))
+                  
+      )
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Update code below to render data table regardless of current state of input$show_data
+  output$moviestable <- DT::renderDataTable(
+    if(input$show_data){
+      DT::datatable(data = movies_sample()[, 1:7], 
+                    options = list(pageLength = 10), 
+                    rownames = FALSE)
+    }
+  )
+  
+  # Display data table tab only if show_data is checked
+  ___(___, {
+    showTab(inputId = ___, target = ___, ___)
+  })
+  
+  ___(___, {
+    hideTab(inputId = ___, target = ___)
+  })
+  
+  # Render data table for codebook
+  output$codebook <- DT::renderDataTable({
+    DT::datatable(data = movies_codebook,
+                  options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+                  rownames = FALSE)
+  })
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(id = "tabspanel", type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable")),
+                  # New tab panel for Codebook
+                  tabPanel("Codebook", 
+                           br(),
+                           DT::dataTableOutput("codebook"))
+                  
+      )
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Update code below to render data table regardless of current state of input$show_data
+  output$moviestable <- DT::renderDataTable({
+    DT::datatable(data = movies_sample()[, 1:7], 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
+  })
+  
+  # Display data table tab only if show_data is checked
+  observeEvent(input$show_data, {
+               if(input$show_data){
+                 showTab(inputId = "tabspanel", target = "Data", select = TRUE)
+               } else {
+                 hideTab(inputId = "tabspanel", target = "Data")
+               }
+  })
+  
+  # Render data table for codebook
+  output$codebook <- DT::renderDataTable({
+    DT::datatable(data = movies_codebook,
+                  options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+                  rownames = FALSE)
+  })
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:c16e760e4d
+## Customize the appearance of your app with shinythemes
+
+As we saw in the previous video, one quick and easy way of customizing the appearance of your app is to apply a theme to it from the `shinythemes` package. You can view theme options at https://rstudio.github.io/shinythemes/.
+
+*** =instructions
+
+- First, add a `themeselector()` widget to your app to see how these themes look on your app.
+- Them, select a theme you like, apply it to your app, and remove the theme selector.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(shinythemes)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(id = "tabspanel", type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable")),
+                  # New tab panel for Codebook
+                  tabPanel("Codebook", 
+                           br(),
+                           DT::dataTableOutput("codebook"))
+                  
+      )
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Update code below to render data table regardless of current state of input$show_data
+  output$moviestable <- DT::renderDataTable({
+    DT::datatable(data = movies_sample()[, 1:7], 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
+  })
+  
+  # Display data table tab only if show_data is checked
+  observeEvent(input$show_data, {
+               if(input$show_data){
+                 showTab(inputId = "tabspanel", target = "Data", select = TRUE)
+               } else {
+                 hideTab(inputId = "tabspanel", target = "Data")
+               }
+  })
+  
+  # Render data table for codebook
+  output$codebook <- DT::renderDataTable({
+    DT::datatable(data = movies_codebook,
+                  options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+                  rownames = FALSE)
+  })
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(shinythemes)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(DT)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+movies_codebook <- read_csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies_codebook.csv")
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(theme = shinytheme("cerulean"),
+  
+  titlePanel("Movie browser, 1970 - 2014", windowTitle = "Movies"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      h3("Plottting"),      # Thid level header: Plotting
+      
+      # Select variable for y-axis 
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis 
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      hr(),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      hr(),
+      
+      # Header
+      h3("Subsetting and sampling"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 50),
+      
+      hr(),
+      
+      # Show data table
+      checkboxInput(inputId = "show_data",
+                    label = "Show data table",
+                    value = TRUE),
+      
+      br(),
+      
+      # Built with Shiny by RStudio
+      br(),
+      h5("Built with",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/04/shiny.png", height = "30px"),
+         "by",
+         img(src = "https://www.rstudio.com/wp-content/uploads/2014/07/RStudio-Logo-Blue-Gray.png", height = "30px"),
+         ".")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      
+      tabsetPanel(id = "tabspanel", type = "tabs",
+                  tabPanel(title = "Plot", 
+                           plotOutput(outputId = "scatterplot"),
+                           br(),
+                           h4(uiOutput(outputId = "n"))),
+                  tabPanel(title = "Data", 
+                           br(),
+                           DT::dataTableOutput(outputId = "moviestable")),
+                  # New tab panel for Codebook
+                  tabPanel("Codebook", 
+                           br(),
+                           DT::dataTableOutput("codebook"))
+                  
+      )
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type) # ensure availablity of value before proceeding
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Update the maximum allowed n_samp for selected type movies
+  observe({
+    updateNumericInput(session, 
+                       inputId = "n_samp",
+                       value = min(50, nrow(movies_subset())),
+                       max = nrow(movies_subset())
+    )
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp) # ensure availablity of value before proceeding
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y,
+                                              color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(x = toTitleCase(str_replace_all(input$x, "_", " ")),
+           y = toTitleCase(str_replace_all(input$y, "_", " ")),
+           color = toTitleCase(str_replace_all(input$z, "_", " ")),
+           title = toTitleCase(input$plot_title))
+  })
+  
+  # Print number of movies plotted 
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    
+    HTML(paste("There are", counts, input$selected_type, "movies in this dataset. <br>"))
+  })
+  
+  # Update code below to render data table regardless of current state of input$show_data
+  output$moviestable <- DT::renderDataTable({
+    DT::datatable(data = movies_sample()[, 1:7], 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
+  })
+  
+  # Display data table tab only if show_data is checked
+  observeEvent(input$show_data, {
+               if(input$show_data){
+                 showTab(inputId = "tabspanel", target = "Data", select = TRUE)
+               } else {
+                 hideTab(inputId = "tabspanel", target = "Data")
+               }
+  })
+  
+  # Render data table for codebook
+  output$codebook <- DT::renderDataTable({
+    DT::datatable(data = movies_codebook,
+                  options = list(pageLength = 10, lengthMenu = c(10, 25, 40)), 
+                  rownames = FALSE)
+  })
+  
+}
+
+# Create Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:73736608ba
+## Congratulations, your first app is complete!
+
+First app is complete and ready for sharing, and list some reactivity best practices, Demo local app running, shinyapps.io, Shiny Server Pro, and RStudio Connect options for deploying apps
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch4_4.master.m3u8

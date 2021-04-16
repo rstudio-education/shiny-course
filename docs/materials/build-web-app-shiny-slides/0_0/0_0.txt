@@ -1,0 +1,3 @@
+My name is Mine Cetinkaya-Rundel, and this course is an introduction to Shiny, the R package for building interactive web apps straight from R.
+
+In this course, you'll learn how to create web applications with reactive components using only R. No HTML or JavaScript required! You'll learn about working with different kinds of user inputs, designing server functions to turn these inputs into outputs and user interfaces to make your app more attractive and user friendly, and perhaps most importantly you’ll be introduced to principles of reactivity in R and Shiny.

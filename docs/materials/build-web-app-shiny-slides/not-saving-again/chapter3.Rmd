@@ -1,0 +1,1392 @@
+---
+title: Reactive programming
+description: ''
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:35a09b66b2
+## Reactive elements
+
+03-01-reactive-elements
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch3_1.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:a58e6f3449
+## Add reactive data frame
+
+We ended the previous chapter with an app that allows you to download a data file with selected variables from the `movies` dataset. We will now extend this app by adding a table output of the selected data as well. Given that the same dataset will be used in two outputs, it makes sense to make our code more efficient by using a reactive data frame.
+
+Extend app by adding reactive data frame, which is a subset, that is used in the plot.
+
+*** =instructions
+
+- Define `movies_selected`: a reactive data frame consisting of selected variables (`input$selected_var`)
+- Use the newly constructed `movies_selected` reactive data frame to avoid reconstructing the subsetted data frame multiple times throughout the app.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(dplyr)
+library(readr)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(dplyr)
+library(readr)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input(s)
+    sidebarPanel(
+      
+      # Select filetype
+      radioButtons(inputId = "filetype",
+                   label = "Select filetype:",
+                   choices = c("csv", "tsv"),
+                   selected = "csv"),
+      
+      # Select variables to download
+      checkboxGroupInput(inputId = "selected_var",
+                         label = "Select variables:",
+                         choices = names(movies),
+                         selected = c("title"))
+      
+    ),
+    
+    # Output(s)
+    mainPanel(
+      DT::dataTableOutput(outputId = "moviestable"),
+      downloadButton("download_data", "Download data")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create reactive data frame
+  movies_selected <- ___
+  
+  # Create data table
+  output$moviestable <- DT::renderDataTable({
+    req(input$selected_var)
+    DT::datatable(data = movies %>% select(input$selected_var), 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
+  })
+  
+  # Download file
+  output$download_data <- downloadHandler(
+    filename = function() {
+      paste0("movies.", input$filetype)
+    },
+    content = function(file) { 
+      if(input$filetype == "csv"){ 
+        write_csv(movies %>% select(input$selected_var), file) 
+      }
+      if(input$filetype == "tsv"){ 
+        write_tsv(movies %>% select(input$selected_var), file) 
+      }
+    }
+  )
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(dplyr)
+library(readr)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input(s)
+    sidebarPanel(
+      
+      # Select filetype
+      radioButtons(inputId = "filetype",
+                   label = "Select filetype:",
+                   choices = c("csv", "tsv"),
+                   selected = "csv"),
+      
+      # Select variables to download
+      checkboxGroupInput(inputId = "selected_var",
+                         label = "Select variables:",
+                         choices = names(movies),
+                         selected = c("title"))
+      
+    ),
+    
+    # Output(s)
+    mainPanel(
+      DT::dataTableOutput(outputId = "moviestable"),
+      downloadButton("download_data", "Download data")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create reactive data frame
+  movies_selected <- reactive({
+    movies %>% select(input$selected_var)
+  })
+  
+  # Create data table
+  output$moviestable <- DT::renderDataTable({
+    req(input$selected_var)
+    DT::datatable(data = movies_selected(), 
+                  options = list(pageLength = 10), 
+                  rownames = FALSE)
+  })
+  
+  # Download file
+  output$download_data <- downloadHandler(
+    filename = function() {
+      paste0("movies.", input$filetype)
+    },
+    content = function(file) { 
+      if(input$filetype == "csv"){ 
+        write_csv(movies_selected(), file) 
+      }
+      if(input$filetype == "tsv"){ 
+        write_tsv(movies_selected(), file) 
+      }
+    }
+  )
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:9cf8b2a1de
+## Identify reactive objects
+
+The `movies_selected()` reactive expression from the video and the previous exercise is a
+
+*** =instructions
+
+- Reactive source
+- Reactive conductor
+- Reactive endpoint
+- Reactive paradigm
+
+*** =hint
+
+Does it have children? Does it have parents? Does it have both?
+
+*** =pre_exercise_code
+```{r}
+
+```
+
+*** =sct
+```{r}
+test_mc(2)
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:fa4c92468a
+## Using reactives
+
+03-02-using-reactives
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch3_2.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:d5789137cf
+## Find missing reactives
+
+In the following app code there are a number of spots where reactives are not used properly.
+
+*** =instructions
+
+Debug the app making sure reactives are being used correctly.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Application title
+  titlePanel("Movie browser"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs(s)
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text for plot title"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film")
+      
+    ),
+    
+    # Output(s)
+    mainPanel(
+      plotOutput(outputId = "scatterplot"),
+      textOutput(outputId = "description")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type)
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Convert plot_title toTitleCase
+  output$pretty_plot_title <- toTitleCase(input$plot_title)
+  
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_subset, 
+           aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point() +
+      labs(title = pretty_plot_title)
+  })
+  
+  # Create descriptive text
+  output$description <- renderText({
+    paste0("The plot above titled '", pretty_plot_title, "' visualizes the relationship between ", input$x, " and ", input$y, ", conditional on ", input$z, ".")
+  })
+  
+}
+
+# Create the Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# Define UI for application that plots features of movies
+ui <- fluidPage(
+  
+  # Application title
+  titlePanel("Movie browser"),
+  
+  # Sidebar layout with a input and output definitions
+  sidebarLayout(
+    
+    # Inputs(s)
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text for plot title"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film")
+      
+    ),
+    
+    # Output(s)
+    mainPanel(
+      plotOutput(outputId = "scatterplot"),
+      textOutput(outputId = "description")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type)
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Convert plot_title toTitleCase
+  pretty_plot_title <- reactive({ toTitleCase(input$plot_title) })
+  
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_subset(), 
+           aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point() +
+      labs(title = pretty_plot_title())
+  })
+  
+  # Create descriptive text
+  output$description <- renderText({
+    paste0("The plot above titled '", pretty_plot_title(), "' visualizes the relationship between ", input$x, " and ", input$y, ", conditional on ", input$z, ".")
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:5d6d22886d
+## Find inconsistencies in what the app is reporting
+
+In this exercise we go on a hunt for mismatched used of reactives.
+
+*** =instructions
+
+- Run the sample code and view the app. Do the number of movies plotted match the number cited in the text below the app?
+- If not, fix the app code.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input(s)
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 3)
+    ),
+    
+    # Output(s)
+    mainPanel(
+      plotOutput(outputId = "scatterplot"),
+      uiOutput(outputId = "n")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type)
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp)
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point()
+  })
+  
+  # Print number of movies plotted
+  output$n <- renderUI({
+    types <- movies_subset()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    HTML(paste("There are", counts, input$selected_type, "movies plotted in the plot above. <br>"))
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(dplyr)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input(s)
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Select which types of movies to plot
+      checkboxGroupInput(inputId = "selected_type",
+                         label = "Select movie type(s):",
+                         choices = c("Documentary", "Feature Film", "TV Movie"),
+                         selected = "Feature Film"),
+      
+      # Select sample size
+      numericInput(inputId = "n_samp", 
+                   label = "Sample size:", 
+                   min = 1, max = nrow(movies), 
+                   value = 3)
+    ),
+    
+    # Output(s)
+    mainPanel(
+      plotOutput(outputId = "scatterplot"),
+      uiOutput(outputId = "n")
+    )
+  )
+)
+
+# Server
+server <- function(input, output, session) {
+  
+  # Create a subset of data filtering for selected title types
+  movies_subset <- reactive({
+    req(input$selected_type)
+    filter(movies, title_type %in% input$selected_type)
+  })
+  
+  # Create new df that is n_samp obs from selected type movies
+  movies_sample <- reactive({ 
+    req(input$n_samp)
+    sample_n(movies_subset(), input$n_samp)
+  })
+  
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point()
+  })
+  
+  # Print number of movies plotted
+  output$n <- renderUI({
+    types <- movies_sample()$title_type %>% 
+      factor(levels = input$selected_type) 
+    counts <- table(types)
+    HTML(paste("There are", counts, input$selected_type, "movies plotted in the plot above. <br>"))
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:90078af43d
+## Reactives and observers
+
+03-03-
+
+Add a reactiveValues element to the app. Define observers and their side effects, and how these compare to reactives
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch3_3.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:d08d0621fe
+## Test understanding of reactiveValues() function
+
+Add another reactiveValues and reactiveVal element to the app
+
+*** =instructions
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+
+```
+
+*** =sample_code
+```{r}
+
+```
+
+*** =solution
+```{r}
+
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:ececae42bc
+## Does this have a side effect? (1)
+
+Provide a simple line of R code as drill exercise assessing understanding of side effects
+
+*** =instructions
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:2bb7b355a2
+## Does this have a side effect? (2)
+
+Provide a chunk of slightly more complex R code as drill exercise assessing understanding of side effects
+
+*** =instructions
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:64eabaea12
+## Stop - trigger - delay
+
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch3_4.master.m3u8
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:e15b4412be
+## Stop with isolate()
+
+In the following app, the user, in addition to controlling which variables are plotted, can adjust the size and transparency of points and define the plot title.
+
+*** =instructions
+
+- Run the code and test out the functionality of the plot title input. Is the plot title updated immediately after you're done typing the title?
+- Modify the app so that the plot title *only* gets updated when one of the other inputs is changed.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title")
+
+    ),
+    
+    # Output:
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = toTitleCase(input$plot_title) )
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title")
+
+    ),
+    
+    # Output:
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = isolate({ toTitleCase(input$plot_title) }) )
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:bd8479db4f
+## Delay with eventReactive()
+
+The following app has the same starter code as the previous exercise.
+
+*** =instructions
+
+Modify the app such that the title is updated only when a button titled "Update plot title" is clicked.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title")
+
+    ),
+    
+    # Output:
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = toTitleCase(input$plot_title) )
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+library(ggplot2)
+library(tools)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating" = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics Score" = "critics_score", 
+                              "Audience Score" = "audience_score", 
+                              "Runtime" = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title Type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA Rating" = "mpaa_rating", 
+                              "Critics Rating" = "critics_rating", 
+                              "Audience Rating" = "audience_rating"),
+                  selected = "mpaa_rating"),
+      
+      # Set alpha level
+      sliderInput(inputId = "alpha", 
+                  label = "Alpha:", 
+                  min = 0, max = 1, 
+                  value = 0.5),
+      
+      # Set point size
+      sliderInput(inputId = "size", 
+                  label = "Size:", 
+                  min = 0, max = 5, 
+                  value = 2),
+      
+      # Enter text for plot title
+      textInput(inputId = "plot_title", 
+                label = "Plot title", 
+                placeholder = "Enter text to be used as plot title"),
+      
+      # Action button for plot title
+      actionButton(inputId = "update_plot_title", 
+                   label = "Update plot title")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+  
+  new_plot_title <- eventReactive(eventExpr = input$update_plot_title, 
+                                 valueExpr = { toTitleCase(input$plot_title) }
+                                 )
+  
+  # Create scatterplot object the plotOutput function is expecting 
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = new_plot_title())
+  })
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:84adc94f29
+## Trigger with observeEvent()
+
+In this app we want two things to happen when an action button is clicked: (1) A message printed to the console stating how many records are shown and (2) A table output of those records.
+
+*** =instructions
+
+- Fill in the necessary function and input ID for printing a message to the console when the action button is clicked.
+- Set up a table output that will print only when action button is clicked, but not when other inputs that go into the creation of that output changes.
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Numeric input for number of rows to show
+      numericInput(inputId = "n_rows",
+                   label = "How many rows do you want to see?",
+                   value = 10),
+      
+      # Action button to show
+      actionButton(inputId = "button", 
+                   label = "Show")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      tableOutput(outputId = "datatable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+
+  # Print a message to the console every time button is pressed;
+  ___(input$___, {
+    cat("Showing", input$n_rows, "rows\n")
+  })
+  
+  # Take a reactive dependency on input$button, but not on any other inputs
+  df <- ___(input$___, {
+    head(movies, input$n_rows)
+  })
+  output$___ <- ___({
+    df()
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =solution
+```{r}
+library(shiny)
+load(url("http://s3.amazonaws.com/assets.datacamp.com/production/course_4850/datasets/movies.Rdata"))
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+    
+    # Input
+    sidebarPanel(
+      
+      # Numeric input for number of rows to show
+      numericInput(inputId = "n_rows",
+                   label = "How many rows do you want to see?",
+                   value = 10),
+      
+      # Action button to show
+      actionButton(inputId = "button", 
+                   label = "Show")
+      
+    ),
+    
+    # Output:
+    mainPanel(
+      tableOutput(outputId = "datatable")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot-
+server <- function(input, output, session) {
+
+  # Pring a message to the console every time button is pressed;
+  observeEvent(input$button, {
+    cat("Showing", input$n_rows, "rows\n")
+  })
+  # Take a reactive dependency on input$button, 
+  # but not on any of the stuff inside the function
+  df <- eventReactive(input$button, {
+    head(movies, input$n_rows)
+  })
+  output$datatable <- renderTable({
+    df()
+  })
+  
+}
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
+*** =sct
+```{r}
+
+```
+
+
+--- type:MultipleChoiceExercise lang:r xp:50 skills:1 key:37f9800b98
+## Difference between eventReactive() and observeEvent()
+
+Which of the following is false?
+
+See the help for `eventReactive` and `eventReactive`, especially the Details section.
+
+*** =instructions
+
+- `observeEvent()` is used to perform an action in response to an event
+- `isolate()` is used to trigger a reaction
+- `eventReactive()` is used to create a calculated value that only updates in response to an event
+- Recalculating a value does not generally count as performing an action
+
+*** =hint
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sct
+```{r}
+test_mc(2)
+```
+
+--- type:VideoExercise lang:r xp:50 skills:1 key:58817ab0e8
+## Reactivity recap
+
+03-05-reactive-recap
+
+*** =video_link
+//player.vimeo.com/video/154783078
+
+*** =video_hls
+//videos.datacamp.com/transcoded/4850_building_web_apps_in_r_with_shiny/v1/hls-4850_ch3_5.master.m3u8
+
+
+
+
+--- type:NormalExercise lang:r xp:100 skills:1 key:2ccaefafe1
+## What's wrong?
+
+What's wrong with this? Fix it.
+
+*** =instructions
+
+*** =hint
+
+Might you be missing a reactive?
+
+*** =pre_exercise_code
+```{r}
+library(shiny)
+```
+
+*** =sample_code
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Add 2"),
+  sidebarLayout(
+    sidebarPanel( sliderInput("x", "Select x", min = 1, max = 50, value = 30) ),
+    mainPanel( textOutput("x_updated") )
+  )
+)
+
+server <- function(input, output, session) {
+  add_2            <- function(x) { x + 2 }
+  current_x        <- add_2(input$x)
+  output$x_updated <- renderText({ current_x })
+}
+```
+
+*** =solution
+```{r}
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Add 2"),
+  sidebarLayout(
+    sidebarPanel( sliderInput("x", "Select x", min = 1, max = 50, value = 30) ),
+    mainPanel( textOutput("x_updated") )
+  )
+)
+
+server <- function(input, output, session) {
+  add_2            <- function(x) { x + 2 }
+  current_x        <- reactive({ add_2(input$x) })
+  output$x_updated <- renderText({ current_x() })
+}
+```
+
+*** =sct
+```{r}
+#Great job on reactivity, now on to customizing the appearance of your app!
+```

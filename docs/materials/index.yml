@@ -1,0 +1,236 @@
+course_title: Building Web Applications in R with Shiny
+course_description: Course description goes here.
+programming_language: r
+chapters:
+  - chapter_title: Introduction and Shiny basics
+    chapter_description: Architecture of a shiny app
+    exercises:
+      - type: VideoExercise
+        title: Welcome to the course!
+        content: >-
+          Introduction and architecture of a Shiny app and reference to cheat
+          sheet for help throughout course, mention ggplot2 and dplyr will be
+          used but they're not prereqs (code will be provided)
+      - type: MultipleChoiceExercise
+        title: The shiny app architecture
+        content: >-
+          Which is not generally a part of the Shiny app architecture as
+          outlined in video? Installing a package
+      - type: NormalExercise
+        title: Here's what a complete Shiny app looks like
+        content: >-
+          Use pre-code to display a simple Shiny app and let learners run app
+          and play with input sliders
+      - type: NormalExercise
+        title: Extend the app
+        content: >-
+          Use pre-code to display the same Shiny app, ask to add more options to
+          selectInput
+      - type: VideoExercise
+        title: >-
+          Single file vs. two file app structure and embedding app in R Markdown
+          file
+        content: >-
+          Introduce two ways to set up the app and emphasize that we will focus
+          on single file structure in the course
+      - type: NormalExercise
+        title: Convert from two file structure to single file
+        content: 'Provide two file structure code, ask to convert to single file'
+      - type: NormalExercise
+        title: Convert from single file structure to two file
+        content: 'Provide single file structure code, ask to convert to two files'
+      - type: NormalExercise
+        title: Embedding app in R Markdown file
+        content: >-
+          Provide single file structure code, ask to convert to embedded version
+          in R Markdown file
+  - chapter_title: 'Inputs, outputs, and rendering functions'
+    chapter_description: >-
+      Relating inputs to rendering functions to outputs, build on one app over
+      the chapter
+    exercises:
+      - type: VideoExercise
+        title: Reactive flow
+        content: >-
+          Demonstrate in a simple app the loop between input to rendering
+          function to output, and how reactivity automatically occurs when an
+          input value is used to render an output object
+      - type: NormalExercise
+        title: Missing input
+        content: >-
+          Leave out one input$ in renderPlot of Shiny app, ask what is missing,
+          complete and run
+      - type: NormalExercise
+        title: Missing output
+        content: >-
+          Leave out UI output in UI of Shiny app, ask what is missing, complete
+          and run
+      - type: NormalExercise
+        title: Add input to rendering function
+        content: >-
+          Provide expanded app code with one more input, ask to incorporate that
+          in the rendering function (either viz or text)
+      - type: VideoExercise
+        title: Demonstrate a few of the UI input options
+        content: 'selectInput, radioButtons, sliderInput, textAreaInput, dateInput'
+      - type: NormalExercise
+        title: Modify existing sliderInput
+        content: >-
+          Give complete app with sliderInput, ask for updating range and default
+          value
+      - type: NormalExercise
+        title: Convert dateInput to dateRangeInput
+        content: 'Give complete app with dateInput, ask for converting to dateRangeInput'
+      - type: NormalExercise
+        title: Add numericInput
+        content: >-
+          Give partial app code and ask for numericInput to be added and output
+          code accordingly updated
+      - type: VideoExercise
+        title: Rendering functions
+        content: 'Demo how renderPlot, renderText, renderPrint and renderDataTable work'
+      - type: NormalExercise
+        title: Missing renderPlot
+        content: >-
+          Provide app code where renderPlot is missing around the plot code
+          chunk, ask what's missing and implement fix
+      - type: NormalExercise
+        title: Add renderText
+        content: Given input text add renderText in the server to complete app
+      - type: VideoExercise
+        title: Demonstrate a few of the UI output options
+        content: 'plotOutput, htmlOutput, textOutput, data table output'
+      - type: NormalExercise
+        title: Show plot output
+        content: 'Provide partial app code, add plotOutput to show the plot in the app'
+      - type: NormalExercise
+        title: Create and format HTML output
+        content: >-
+          Use values calculated in app chunk in paste() command to create
+          custmized HTML output with specified formatting (centered)
+      - type: NormalExercise
+        title: Download data with downloadButton
+        content: >-
+          Download the selected data with downloadButton using instructions help
+          files to figure out exactly how it works
+  - chapter_title: Customizing appearance
+    exercises:
+      - type: VideoExercise
+        title: Interface builder functions
+        content: Demo a few of the simpler interface builder options with HTML code
+      - type: NormalExercise
+        title: Add text with HTML tags in the main panel
+        content: Add explanatory tags with HTML tags in the main panel
+      - type: NormalExercise
+        title: Add image with img tag
+        content: Add RStudio logo to the app
+      - type: VideoExercise
+        title: Layout panels
+        content: 'sidebarPanel(), mainPanel(), titlePanel(), conditionalPanel()'
+      - type: NormalExercise
+        title: Extend the sidebar
+        content: Add input elements to the sidebar
+      - type: NormalExercise
+        title: Extend the mainPanel
+        content: Add input elements to the main panel
+      - type: NormalExercise
+        title: Add a conditional panel
+        content: Add a conditional panel based on user input selection
+      - type: VideoExercise
+        title: Panels and tabsets
+        content: Distributing contents across tabs with tabPanel() and tabsetPanel()
+      - type: NormalExercise
+        title: Create new tab for displaying data table
+        content: Create new tab for displaying data table
+      - type: NormalExercise
+        title: Create new conditional tab for displaying data table
+        content: Display the data table in new tab only if checkbox is checked
+      - type: NormalExercise
+        title: Add new plot to new tab
+        content: More extensive extension with new plot in a new tab
+      - type: VideoExercise
+        title: Demo how to include CSS in the app
+        content: Demo the use of includeCSS()
+      - type: NormalExercise
+        title: Add CSS code to app
+        content: Add CSS code directly to app
+      - type: NormalExercise
+        title: Include external CSS file in app
+        content: Use includeCSS() to add styling to app
+    chapter_description: ''
+  - chapter_title: Reactive programming
+    exercises:
+      - type: VideoExercise
+        title: >-
+          Reactive objects - sources, endpoints, and conductors - and how to
+          view the reactivity graph
+        content: Define reactive sources and endpoints and show examples within an app
+      - type: NormalExercise
+        title: Add reactive data frame
+        content: >-
+          Extend app by adding reactive data frame, which is a subset, that is
+          used in the plot
+      - type: NormalExercise
+        title: Report dimensions of reactive data frame
+        content: >-
+          Extend app by calculating dimensions of reactive data frame and
+          reporting in textOutput
+      - type: VideoExercise
+        title: When to use reactives
+        content: >-
+          Reactives let you not repeat yourself, decompose large, complex
+          (code-wise, not necessarily CPU-wise) calculations into smaller pieces
+          -- benefits similar to functionalizing R code
+      - type: NormalExercise
+        title: Find inconsistencies in what the app is reporting
+        content: >-
+          For consistency find one more spot in the app where the reactive
+          subset should be used
+      - type: NormalExercise
+        title: Find missing reactive
+        content: >-
+          Provide code for plotting a random sample of points in the code where
+          reactives are not being used properly
+      - type: VideoExercise
+        title: reactiveValues() and observers
+        content: >-
+          Add a reactiveValues element to the app. Define observers and their
+          side effects, and how these compare to reactives
+      - type: NormalExercise
+        title: Test understanding of reactiveValues() function
+        content: Add another reactiveValues element to the app
+      - type: MultipleChoiceExercise
+        title: Does this have a side effect? (1)
+        content: >-
+          Provide a simple line of R code as drill exercise assessing
+          understanding of side effects
+      - type: MultipleChoiceExercise
+        title: Does this have a side effect? (2)
+        content: >-
+          Provide a chunk of slightly more complex R code as drill exercise
+          assessing understanding of side effects
+      - type: VideoExercise
+        title: Stop - trigger - delay
+        content: >-
+          Stop with isolate(), trigger with observeEvent(), delay with
+          eventReactive()
+      - type: NormalExercise
+        title: Stop with isolate()
+        content: >-
+          Only update plot title when other components of the plot are also
+          updated
+      - type: NormalExercise
+        title: Trigger with observeEvent()
+        content: Download a CSV of the sampled data when action button is pressed
+      - type: NormalExercise
+        title: Delay with eventReactive()
+        content: >-
+          Change how the random sample is generated such that it is updated when
+          the user clicks on an action button that says “Get new sample”.
+      - type: VideoExercise
+        title: 'Congratulations, your first app is complete!'
+        content: >-
+          First app is complete and ready for sharing, and list some reactivity
+          best practices, Demo local app running, shinyapps.io, Shiny Server
+          Pro, and RStudio Connect options for deploying apps
+    chapter_description: ''

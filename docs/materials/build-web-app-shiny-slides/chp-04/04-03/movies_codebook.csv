@@ -1,0 +1,35 @@
+Column,Variable name,Description
+1,"title	",Title of movie
+2,title_type,Type of movie
+3,genre,Genre of movie
+4,"runtime	",Runtime of movie (in minutes)
+5,mpaa_rating,MPAA rating of the movie
+6,studio,Studio that produced the movie
+7,thtr_rel_date,Theater release date
+8,thtr_rel_year,Theater release year
+9,thtr_rel_month,Theater release month
+10,thtr_rel_day,Theater release day
+11,dvd_rel_date,DVD release date
+12,dvd_rel_year,DVD release year
+13,dvd_rel_month,DVD release month
+14,dvd_rel_day,DVD release day
+15,imdb_rating,IMDB rating
+16,"imdb_num_votes	",Number of votes on IMDB
+17,critics_rating,Categorical variable for critics rating on Rotten Tomatoes
+18,critics_score,Critics score on Rotten Tomatoes
+19,audience_rating,Categorical variable for audience rating on Rotten Tomatoes 
+20,audience_score (response variable),Audience score on Rotten Tomatoes
+21,best_pic_nom,Whether or not the movie was nominated for a best picture Oscar
+22,best_pic_win,Whether or not the movie won a best picture Oscar
+23,best_actor_win,Whether or not one of the main actors in the movie ever won an Oscar
+24,best_actress win,Whether or not one of the main actresses in the movie ever won an Oscar
+25,best_dir_win,Whether or not the director of the movie ever won an Oscar
+26,top200_box,Whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo
+27,director,Director of the movie
+28,actor1,First main actor/actress from the abridged cast. This information was used to determine whether the movie casts an actor or actress who won a best actor or actress Oscar.
+29,actor2,Second main actor/actress from the abridged cast. This information was used to determine whether the movie casts an actor or actress who won a best actor or actress Oscar.
+30,actor3,Third main actor/actress from the abridged cast. This information was used to determine whether the movie casts an actor or actress who won a best actor or actress Oscar.
+31,actor4,Fourth main actor/actress from the abridged cast. This information was used to determine whether the movie casts an actor or actress who won a best actor or actress Oscar.
+32,actor5,Fifth main actor/actress from the abridged cast. This information was used to determine whether the movie casts an actor or actress who won a best actor or actress Oscar.
+33,"	imdb_url",Link to IMDB page for the movie
+34,"	rt_url",Link to Rotten Tomatoes page for the movie
