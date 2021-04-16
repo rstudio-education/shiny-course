@@ -185,7 +185,7 @@ fluidPage(
 
 Additionally, the most commonly used tags are wrapped in their own functions and you can use them without the tags list. 
 
-```{r eval = FALSE, echo = TRUE}
+```{r, eval = FALSE, echo = TRUE}
 tags$p(...)       -> p(...)
 tags$h1(...)      -> h1(...)
 tags$h2(...)      -> h2(...)
@@ -300,7 +300,17 @@ These next exercises will demo a few of the simpler interface builder options wi
 
 ### Add text with HTML tags
 
-Add explanatory text to your movie app by using HTML tags in the main panel. We demo an example of this with the code below.
+Add explanatory text to your movie app by using HTML tags in the main panel. 
+
+Below is some sample text you can add. Note that you should replace `[NUMBER OF MOVIES]` with with the number of movies in the sample, and instead of hardcoding this value, 
+you can use `nrow(movies)` to calculate it.
+
+```
+These data were obtained from <a href="http://www.imbd.com/">IMBD</a> and 
+<a href="https://www.rottentomatoes.com/">Rotten Tomatoes</a>.
+
+The data represent _[NUMBER OF MOVIES]_ randomly sampled movies released between 1972 to 2014 in the United States.
+```
 
 :::proj
 
@@ -310,98 +320,105 @@ Add explanatory text to your movie app by using HTML tags in the main panel. We 
 
 :::
 
-```{r, echo = TRUE, eval = FALSE}
+```{r ex-4-1a-html, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
 library(tools)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
-ui <- fluidPage(
-  
-  sidebarLayout(
-    
-    
-    # Input
-    sidebarPanel(
-      
-      # Select variable for y-axis
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "audience_score"),
-      
-      # Select variable for x-axis
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "critics_score"),
-      
-      # Select variable for color
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title Type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA Rating" = "mpaa_rating", 
-                              "Critics Rating" = "critics_rating", 
-                              "Audience Rating" = "audience_rating"),
-                  selected = "mpaa_rating"),
-      
-      # Set alpha level
-      sliderInput(inputId = "alpha", 
-                  label = "Alpha:", 
-                  min = 0, max = 1, 
-                  value = 0.5),
-      
-      # Set point size
-      sliderInput(inputId = "size", 
-                  label = "Size:", 
-                  min = 0, max = 5, 
-                  value = 2),
-      
-      # Enter text for plot title
-      textInput(inputId = "plot_title", 
-                label = "Plot title", 
-                placeholder = "Enter text to be used as plot title"),
-      
-      # Action button for plot title
-      actionButton(inputId = "update_plot_title", 
-                   label = "Update plot title")
-      
-    ),
-    
-    # Output:
-    mainPanel(
-      
-      # Explanatory text:
-      tags$br(),
-      tags$p("These data were obtained from",
-             tags$a("IMBD", href = "http://www.imbd.com/"), "and", 
-             tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."), 
-      tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States."), 
-      
-      plotOutput(outputId = "scatterplot")
+# Define UI --------------------------------------------------------------------
 
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      ),
+
+      actionButton(
+        inputId = "update_plot_title",
+        label = "Update plot title"
+      )
+    ),
+
+    mainPanel(
+      tags$br(),
+      ___, # add text here
+      plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Define server function required to create the scatterplot-
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
-  
-  new_plot_title <- eventReactive(eventExpr = input$update_plot_title, 
-                                  valueExpr = { toTitleCase(input$plot_title) }
+  new_plot_title <- eventReactive(
+    eventExpr = input$update_plot_title,
+    valueExpr = {
+      toTitleCase(input$plot_title)
+    }
   )
-  
-  # Create scatterplot object the plotOutput function is expecting 
+
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point(alpha = input$alpha, size = input$size) +
@@ -409,16 +426,140 @@ server <- function(input, output, session) {
   })
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-4-1a-html-solution, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+library(ggplot2)
+library(tools)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      ),
+
+      actionButton(
+        inputId = "update_plot_title",
+        label = "Update plot title"
+      )
+    ),
+
+    mainPanel(
+      tags$br(),
+      tags$p(
+        "These data were obtained from",
+        tags$a("IMBD", href = "http://www.imbd.com/"), "and",
+        tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+      ),
+      tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States."),
+
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {
+  new_plot_title <- eventReactive(
+    eventExpr = input$update_plot_title,
+    valueExpr = {
+      toTitleCase(input$plot_title)
+    }
+  )
+
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = new_plot_title())
+  })
+}
+
+# Create the Shiny app object --------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+</details>
 
 ### Add image with the `img` tag
 
 Now let's practice adding an image to a very simple app.  
 
-Note that if you'd like to use a local image for with your app, you'll first have to save the image in a folder `www/` within your root directory. You'll see what we mean when you run the demo in the RStudio Cloud Project.
+Note that if you'd like to use a local image for with your app, you'll first have to save the image in a folder `www/` within your root directory. You'll see what we mean when you run the demo in the RStudio Cloud Project. Set a height and width for your image as well.
 
 :::proj
 
@@ -429,26 +570,56 @@ Note that if you'd like to use a local image for with your app, you'll first hav
 :::
 
 
-```{r solution, include = FALSE}
+```{r ex-4-1b-img, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 
+
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
-  titlePanel("Add 2"),
-  tags$img(height = 100, width = 300, src = "roles_implement.png"),
-  sidebarLayout(
-    sidebarPanel( sliderInput("x", "Select x", min = 1, max = 50, value = 30) ),
-    mainPanel( textOutput("x_updated") )
-  )
+  titlePanel("An image"),
+  tags$img(___),
 )
 
-server <- function(input, output, session) {
-  add_2            <- function(x) { x + 2 }
-  current_x        <- reactive({ add_2(input$x) })
-  output$x_updated <- renderText({ current_x() })
-}
+# Define server ----------------------------------------------------------------
 
-shinyApp(ui, server)
+server <- function(input, output, session) {}
+
+# Create the Shiny app ---------------------------------------------------------
+
+shinyApp(ui = ui, server = server)
 ```
+
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-4-1b-img-solution, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(
+  titlePanel("An image"),
+  tags$img(height = 100, width = 300, src = "roles_implement.png"),
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {}
+
+# Create the Shiny app ---------------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+</details>
 
 ## 4.2 Layout Panels
 
@@ -460,7 +631,7 @@ One useful function for customizing the layout of your app is `fluidRow()`. This
 
 You can add as many rows as you want, but you want to be careful about expanding your app too much vertically as your users might not be willing to scroll down to interact with your app in full.
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with fluid rows
@@ -480,7 +651,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   "Side", "by", "side", "text",
   fluidRow("Text on row 1"),
@@ -495,7 +666,7 @@ fluidPage(
 
 The column function is also incredibly useful. It adds columns within a row, and it requires that you define a width for each column. 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with fluid rows and columns
@@ -520,7 +691,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   fluidRow(
     column("R1, C1, width = 3", width = 3),
@@ -542,7 +713,7 @@ The total width of columns within any given row should add up to 12. You can use
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   strong("3 + 9 = 12"),
   fluidRow(
@@ -570,7 +741,7 @@ This is especially important and useful for complex apps with a large number of 
 
 The `wellpanel()` function groups elements into a grey well, or a box with rounded corners. This is a look you should be used to seeing in shiny apps by now.
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with wellPanels
@@ -589,7 +760,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   wellPanel( fluidRow("Row 1") ),
   wellPanel( fluidRow("Row 2") ),
@@ -603,7 +774,7 @@ fluidPage(
 
 Shiny offers 12 different panels, but we'll take a look at a small subset of them in this section, and then you'll get to work with a few others in the exercises that follow.
 
-```{r eval = FALSE}
+```{r, eval = FALSE}
 absolutePanel(...)
 fixedPanel(...)
 conditionalPanel(...)
@@ -624,7 +795,7 @@ We have made heavy use of `sidebarPanel()` and `mainPanel()` in our apps in this
 
 The default width for a `sidebarPanel()` is 4 and for a `mainPanel()` is 8. 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with default width sidebar
@@ -648,7 +819,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   sidebarLayout(
     sidebarPanel(
@@ -670,7 +841,7 @@ fluidPage(
 
 If you wanted to make an app where the `sidebar` and `mainPanel` are of equal width, so the app is split down the middle, you can specify a width argument to the `sidebarPanel()` and `mainPanel()` functions and set each to 6. 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with default width sidebar
@@ -688,7 +859,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   sidebarLayout(
     sidebarPanel("Sidebar with width = 6", width = 6),
@@ -703,7 +874,7 @@ fluidPage(
 
 The `titlePanel()` is used to create a panel containing an application title. Often it makes sense to include this panel outside the `sidebarLayout()`. But in addition to the title on the page, youmight want to also change the text that shows up on the browser tab for our app, especially if our title is long. 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with title panel
@@ -722,7 +893,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   titlePanel("My awesome app"),
   sidebarLayout(
@@ -738,7 +909,7 @@ fluidPage(
 
 To customize this text you specify the `windowTitle` argument in the `titlePanel()`, which is by default equal to the application title. For example, your application title might be "Movie browser, 1970 to 2014", but you might just want to make your window title "Movies".
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with title panel and window title
@@ -757,7 +928,7 @@ shinyApp(ui = ui, server = server)
 
 ---
 
-```{r eval = TRUE, echo = FALSE}
+```{r, eval = TRUE, echo = FALSE}
 fluidPage(
   titlePanel("Movie browser, 1970 to 2014",
              windowTitle = "Movies"),
@@ -806,7 +977,7 @@ fluidPage(
 )
 ```
 
-```{r context = "server"}
+```{r, context = "server"}
 output$random_number <- renderText({
   input$go
   raw <- runif(1)
@@ -829,7 +1000,7 @@ Under the hood this function evaluates a JavaScript expression once at startup a
 
 Being able to display panels conditional on previous user selections is a powerful feature of Shiny. 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with conditionalPanel
@@ -896,19 +1067,24 @@ In this example we display
 - and some background information on our dataset in the fourth tab.
 
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 mainPanel(
   tabsetPanel(
     type = "tabs",
     tabPanel("Plot", plotOutput("plot")),
     tabPanel("Summary", tableOutput("summary")),
     tabPanel("Data", DT::dataTableOutput("data")),
-    tabPanel("Reference", 
-             tags$p("There data were obtained from",
-                    tags$a("IMDB", href = "http://www.imdb.com/"), "and",
-                    tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."),
-             tags$p("The data represent", nrow(movies), 
-                    "randomly sampled movies released between 1972 to 2014 in the United States.")
+    tabPanel(
+      "Reference",
+      tags$p(
+        "There data were obtained from",
+        tags$a("IMDB", href = "http://www.imdb.com/"), "and",
+        tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+      ),
+      tags$p(
+        "The data represent", nrow(movies),
+        "randomly sampled movies released between 1972 to 2014 in the United States."
+      )
     )
   )
 )
@@ -916,14 +1092,13 @@ mainPanel(
 
 ---
 
-```{r context = "data"}
+```{r, context = "data"}
 load("movies.RData")
 ```
 
 
 ```{r}
 fluidPage(
-
   titlePanel("Movie browser, 1970 to 2014", windowTitle = "Movies"),
 
   sidebarLayout(
@@ -949,14 +1124,14 @@ fluidPage(
             tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
           ),
           tags$p("The data represent ", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the Unites States.")
-        ) 
+        )
       )
     )
   )
 )
 ```
 
-```{r context = "server"}
+```{r, context = "server"}
 movies_subset <- reactive({
   movies %>%
     filter(title_type %in% input$type)
@@ -965,15 +1140,20 @@ movies_subset <- reactive({
 output$plot <- renderPlot({
   ggplot(movies_subset(), aes(x = critics_score, y = audience_score, color = mpaa_rating)) +
     geom_point()
- })
+})
 
-output$summary <- renderTable({
-  movies_subset() %>%
-    group_by(mpaa_rating) %>%
-    summarise(mean_as = mean(audience_score), sd_as = sd(audience_score),
-              mean_cs = mean(critics_score), sd_cs = sd(critics_score),
-              n = n(), cor = cor(audience_score, critics_score))
-}, digits = 3)
+output$summary <- renderTable(
+  {
+    movies_subset() %>%
+      group_by(mpaa_rating) %>%
+      summarise(
+        mean_as = mean(audience_score), sd_as = sd(audience_score),
+        mean_cs = mean(critics_score), sd_cs = sd(critics_score),
+        n = n(), cor = cor(audience_score, critics_score)
+      )
+  },
+  digits = 3
+)
 
 output$data <- DT::renderDataTable({
   movies_subset() %>%
@@ -997,7 +1177,7 @@ Instead, we calculate the data once in a reactive expression, and then have the 
 
 Another option for laying out tabs is using the `navlistpanel()`, which lists the tabs vertically down the side, as opposed to horizontally across the screen.
 
-```{r echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 mainPanel(
   navlistPanel(
     tabPanel("Plot", plotOutput("plot")),
@@ -1020,7 +1200,6 @@ mainPanel(
 
 ```{r}
 fluidPage(
-
   titlePanel("Movie browser, 1970 to 2014", windowTitle = "Movies"),
 
   sidebarLayout(
@@ -1053,7 +1232,7 @@ fluidPage(
 )
 ```
 
-```{r context = "server"}
+```{r, context = "server"}
 movies_subset2 <- reactive({
   movies %>%
     filter(title_type %in% input$type)
@@ -1062,15 +1241,20 @@ movies_subset2 <- reactive({
 output$plot2 <- renderPlot({
   ggplot(movies_subset(), aes(x = critics_score, y = audience_score, color = mpaa_rating)) +
     geom_point()
- })
+})
 
-output$summary2 <- renderTable({
-  movies_subset2() %>%
-    group_by(mpaa_rating) %>%
-    summarise(mean_as = mean(audience_score), sd_as = sd(audience_score),
-              mean_cs = mean(critics_score), sd_cs = sd(critics_score),
-              n = n(), cor = cor(audience_score, critics_score))
-}, digits = 3)
+output$summary2 <- renderTable(
+  {
+    movies_subset2() %>%
+      group_by(mpaa_rating) %>%
+      summarise(
+        mean_as = mean(audience_score), sd_as = sd(audience_score),
+        mean_cs = mean(critics_score), sd_cs = sd(critics_score),
+        n = n(), cor = cor(audience_score, critics_score)
+      )
+  },
+  digits = 3
+)
 
 output$data2 <- DT::renderDataTable({
   movies_subset2() %>%
@@ -1090,7 +1274,7 @@ There are many other ways of customizing the look of your app, including using c
 
 In order to use one of these themes, you need to load the `shinythemes` package first. The package website has thumbnail images of each of the themes, but it can be difficult to tell exactly how the theme will look on your app. 
 
-```{r out.width = "100%"}
+```{r, out.width = "100%"}
 knitr::include_graphics("images/shinythemes.png")
 ```
 
@@ -1102,14 +1286,14 @@ It can be inserted anywhere inside of the application, although if it is put ins
 
 This widget is to be used in development only. Once you decide on a theme, you should remove the widget and just define the theme you want using the `shinytheme()` function.
 
-```{r eval = FALSE, echo = TRUE}
+```{r, eval = FALSE, echo = TRUE}
 fluidPage(
   shinythemes::themeSelector(),
   ...
 )
 ```
 
-```{r out.width = "100%"}
+```{r, out.width = "100%"}
 knitr::include_graphics("images/themeselector.png")
 ```
 
@@ -1127,9 +1311,8 @@ Next up you get to build an app with tabs and see how it looks with different sh
 
 ### Customize the appearance of your app with shinythemes
 
-Pick a theme and apply to the existing app.
-https://rstudio.github.io/shinythemes/
-
+Pick a theme and apply to the existing app. See 
+https://rstudio.github.io/shinythemes for more on theme options.
 
 :::proj
 
@@ -1139,12 +1322,254 @@ https://rstudio.github.io/shinythemes/
 
 :::
 
+```{r ex-4-4-theme, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+library(ggplot2)
+library(tools)
+library(shinythemes)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      ),
+
+      actionButton(
+        inputId = "update_plot_title",
+        label = "Update plot title"
+      )
+    ),
+
+    mainPanel(
+      tags$br(),
+      tags$p(
+        "These data were obtained from",
+        tags$a("IMBD", href = "http://www.imbd.com/"), "and",
+        tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+      ),
+      tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States."),
+
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {
+  new_plot_title <- eventReactive(
+    eventExpr = input$update_plot_title,
+    valueExpr = {
+      toTitleCase(input$plot_title)
+    }
+  )
+
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = new_plot_title())
+  })
+}
+
+# Create the Shiny app object --------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-4-4-theme-solution, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+library(ggplot2)
+library(tools)
+library(shinythemes)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(theme = shinytheme("united"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      ),
+
+      actionButton(
+        inputId = "update_plot_title",
+        label = "Update plot title"
+      )
+    ),
+
+    mainPanel(
+      tags$br(),
+      tags$p(
+        "These data were obtained from",
+        tags$a("IMBD", href = "http://www.imbd.com/"), "and",
+        tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+      ),
+      tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States."),
+
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {
+  new_plot_title <- eventReactive(
+    eventExpr = input$update_plot_title,
+    valueExpr = {
+      toTitleCase(input$plot_title)
+    }
+  )
+
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
+      geom_point(alpha = input$alpha, size = input$size) +
+      labs(title = new_plot_title())
+  })
+}
+
+# Create the Shiny app object --------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+</details>
 
 ## 4.5 Congratulations!
 
 You now know how to get started with building web apps in R with Shiny! 
 
-### What did youlearn?
+### What did you learn?
 
 In this course you have learned:
 

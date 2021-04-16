@@ -28,4 +28,9 @@ extract_solutions(
 extract_solutions(
   rmd = "03-reactivity/03-reactivity.Rmd",
   out_dir = "03-reactivity/solutions"
-  )
+)
+
+extract_solutions(
+  rmd = "04-ui/04-ui.Rmd",
+  out_dir = "04-ui/solutions"
+)
