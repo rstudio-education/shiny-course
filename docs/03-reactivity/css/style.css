@@ -24,7 +24,7 @@ body, button, input, textarea {
 body {
   background-color: #ffffff;
   color: #404040;
-  font-size: 19px;
+  font-size: 19px !important;
   line-height: 1.6em;
 }
 
@@ -71,7 +71,6 @@ h3 {
 /* Remove extra space on mobile */
 
 @media screen and (max-width: 767px) {
-  
 
   div.section {
     padding-top: 1em;
@@ -101,8 +100,6 @@ h3 {
     background-color: white;
     border-left: 1pt solid #cccccc66;
 }
-
-
 
 /*--------- Headers ---------*/
 
@@ -255,7 +252,7 @@ h2.tutorialTitle,
 
 .topicsList .topic {
   color: #757373;
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: 1pt;
   line-height: 1.25em;
   padding: 0.75em 0;
@@ -354,34 +351,6 @@ outline-offset: 0;
 
 a.test-drive:hover {
   color: white !important;
-}
-
-/*-------Colored Bullets-------*/
-
-.section ul {
-  list-style: none; /* Remove default bullets */
-}
-
-.section ul li::before {
-    content: "\2022";
-    color: #194977;
-    display: inline-block;
-    position: relative;
-    left: 1em;
-    top: 0.2rem;
-    font-size: 1.6em;
-    line-height: 1;
-    width: 2em;
-    margin-left: -2em;/* Also needed for space (tweak if needed) */
-}
-
-.section ul > li > p {
-  display: inline; /* to have content show up next to bullet */
-}
-
-.section ul > li { /*to add back in space between bullet items that I took away by making p display inline */
-  margin-top: 1em;
-  margin-bottom: 1em;
 }
 
 /* RStudio Cloud Project Buttons */

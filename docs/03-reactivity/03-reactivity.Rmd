@@ -16,6 +16,13 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(usethis)
+library(devtools)
+library(rsconnect)
+
 knitr::opts_chunk$set(
   echo = FALSE, 
   fig.align = "center",

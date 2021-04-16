@@ -16,6 +16,13 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(usethis)
+library(devtools)
+library(rsconnect)
+
 knitr::opts_chunk$set(
   echo = FALSE, 
   fig.align = "center",
@@ -127,26 +134,28 @@ As we saw in the previous sections, reactivity is established by linking an inpu
 
 
 ```{r, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
@@ -159,78 +168,80 @@ ui <- fluidPage(
                   value = ___)
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point(alpha = ___)
   })
+  
 }
 
-# Create the Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r ex1-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "critics_score"),
       
-      # Set alpha level
       sliderInput(inputId = "alpha", 
                   label = "Alpha:", 
                   min = 0, max = 1, 
                   value = 0.5)
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point(alpha = input$alpha)
   })
 }
 
-# Create the Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -255,90 +266,92 @@ The server function of this app builds two plots, `scatterplot` and `densityplot
 
 
 ```{r, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
-
-  # Sidebar layout with a input and output definitions
+  
   sidebarLayout(
-
-    # Inputs: Select variables to plot
+    
     sidebarPanel(
-
-      # Select variable for y-axis
+      
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
-
-      # Select variable for x-axis
+      
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "critics_score")
     ),
-
-    # Output: Show scatterplot
+    
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Define server function required to create the scatterplot
-server <- function(input, output, session) {
+# Define server ----------------------------------------------------------------
 
-  # Create scatterplot
+server <- function(input, output, session) {
+  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
-
-  # Create densityplot
+  
   output$densityplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x)) +
       geom_density()
   })
-
+  
 }
 
-# Create the Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 *Hint:* Make sure you place commas as appropriate.
 
 ```{r ex2-solution, include = FALSE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
 
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
 
-    # Inputs: Select variables to plot
     sidebarPanel(
 
-      # Select variable for y-axis
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
 
-      # Select variable for x-axis
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "critics_score")
     ),
 
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       plotOutput(outputId = "densityplot", height = 200)
@@ -346,16 +359,15 @@ ui <- fluidPage(
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
 
-  # Create scatterplot
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
 
-  # Create densityplot
   output$densityplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x)) +
       geom_density()
@@ -363,7 +375,8 @@ server <- function(input, output, session) {
 
 }
 
-# Create the Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -471,7 +484,7 @@ This function takes one argument, the `outputId`. Again, you can define to be an
 # Print data table if checked 
 output$moviestable <- renderDataTable({
   if(input$show_data){
-    datatable(data = movies %>% select(1:7),
+    DT::datatable(data = movies %>% select(1:7),
                   options = list(pageLength = 10),
                   rownames = FALSE)
   } 
@@ -539,77 +552,82 @@ The app below allows users to randomly select a desired number of movies, and di
 :::
 
 ```{r eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+library(DT)
+
+# Load data --------------------------------------------------------------------
 
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Text instructions
       HTML(paste("Enter a value between 1 and", "651"))
       
-      # Numeric input for sample size
       numericInput(inputId = "n",
                    value = 3,
                    step = 10)
       
     ),
     
-    # Output: Show data table
     mainPanel(
-      dataTableOutput(outputId = "moviestable")
+      DT::dataTableOutput(outputId = "moviestable")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create data table
-  output$moviestable <- renderDataTable({
+  output$moviestable <- DT::renderDataTable({
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
-    datatable(data = movies_sample, 
+    DT::datatable(data = movies_sample, 
                   options = list(pageLength = 10), 
                   rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r ex-2-2a-solution, include = FALSE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+library(DT)
+
+# Load data --------------------------------------------------------------------
 
 load("movies.RData")
-
 n_total <- nrow(movies)
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Text instructions
       HTML(paste("Enter a value between 1 and", n_total)),
       
-      # Numeric input for sample size
       numericInput(inputId = "n",
                    label = "Sample size:",
                    value = 30,
@@ -618,29 +636,29 @@ ui <- fluidPage(
       
     ),
     
-    # Output: Show data table
     mainPanel(
       dataTableOutput(outputId = "moviestable")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create data table
   output$moviestable <- renderDataTable({
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
-    datatable(data = movies_sample, 
+    DT::datatable(data = movies_sample, 
                   options = list(pageLength = 10), 
                   rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -673,28 +691,27 @@ The `req()` function is the simplest and best way to do this, it ensures that va
 :::
 
 ```{r, eval = FALSE, echo = TRUE}
-library(shiny)
-library(dplyr)
+# Load packages ----------------------------------------------------------------
 
+library(shiny)
+library(ggplot2)
 options("shiny.sanitize.errors" = FALSE) # Turn off error sanitization
 
-load("movies.RData")
+# Load data --------------------------------------------------------------------
 
+load("movies.RData")
 n_total <- nrow(movies)
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Text instructions
       HTML(paste("Enter a value between 1 and", n_total)),
       
-      # Numeric input for sample size
       numericInput(inputId = "n",
                    label = "Sample size:",
                    value = 30,
@@ -703,55 +720,55 @@ ui <- fluidPage(
       
     ),
     
-    # Output: Show data table
     mainPanel(
-      dataTableOutput(outputId = "moviestable")
+      DT::dataTableOutput(outputId = "moviestable")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create data table
-  output$moviestable <- renderDataTable({
+  output$moviestable <- DT::renderDataTable({
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
     datatable(data = movies_sample, 
-                  options = list(pageLength = 10), 
-                  rownames = FALSE)
+              options = list(pageLength = 10), 
+              rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 
 ```{r, ex-2-2b-solution, echo = FALSE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
-library(dplyr)
+library(ggplot2)
+options("shiny.sanitize.errors" = FALSE) # Turn off error sanitization
+
+# Load data --------------------------------------------------------------------
 
 load("movies.RData")
-
-n_total <- nrow(movies)
 n_total <- nrow(movies)
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   
-  # Sidebar layout with a input and output definitions
   sidebarLayout(
     
-    # Inputs: Select variables to plot
     sidebarPanel(
       
-      # Text instructions
       HTML(paste("Enter a value between 1 and", n_total)),
       
-      # Numeric input for sample size
       numericInput(inputId = "n",
                    label = "Sample size:",
                    value = 30,
@@ -760,30 +777,30 @@ ui <- fluidPage(
       
     ),
     
-    # Output: Show data table
     mainPanel(
       dataTableOutput(outputId = "moviestable")
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create data table
   output$moviestable <- renderDataTable({
     req(input$n)
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
     datatable(data = movies_sample, 
-                  options = list(pageLength = 10), 
-                  rownames = FALSE)
+              options = list(pageLength = 10), 
+              rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -814,17 +831,23 @@ The app below can be used to display movies from selected studios. Currently you
 :::
 
 ```{r eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+library(DT)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
-     
 all_studios <- sort(unique(movies$studio))
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
-    sidebarLayout(
+  sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       selectInput(inputId = "studio",
                   label = "Select studio:",
@@ -833,41 +856,47 @@ ui <- fluidPage(
       
     ),
     
-    # Output(s)
     mainPanel(
-      dataTableOutput(outputId = "moviestable")
+      DT::dataTableOutput(outputId = "moviestable")
     )
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create data table
   output$moviestable <- renderDataTable({
     movies_from_selected_studios <- movies %>%
       filter(studio == input$studio) %>%
       select(title:studio)
-    datatable(data = movies_from_selected_studios, 
-                  options = list(pageLength = 10), 
-                  rownames = FALSE)
+    DT::datatable(data = movies_from_selected_studios, 
+              options = list(pageLength = 10), 
+              rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
 shinyApp(ui = ui, server = server)
 ```
 
 
 ```{r, ex-2-2c-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
-load("movies.RData")
+library(dplyr)
+library(DT)
 
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
 all_studios <- sort(unique(movies$studio))
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
     sidebarLayout(
     
@@ -896,14 +925,15 @@ server <- function(input, output, session) {
     movies_from_selected_studios <- movies %>%
       filter(studio %in% input$studio) %>%
       select(title:studio)
-    datatable(data = movies_from_selected_studios, 
+    DT::datatable(data = movies_from_selected_studios, 
                   options = list(pageLength = 10), 
                   rownames = FALSE)
   })
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -935,46 +965,46 @@ The app below can be used to display movies from a particular date onwards. Inst
 :::
 
 ```{r, eval = FALSE, echo = TRUE}
-library(shiny)
-library(dplyr)
-library(ggplot2)
-load("movies.RData")
+# Load packages ----------------------------------------------------------------
 
+library(shiny)
+library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
 min_date <- min(movies$thtr_rel_date)
 max_date <- max(movies$thtr_rel_date)
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
-    sidebarLayout(
+  sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Explanatory text
       HTML(paste0("Movies released since the following date will be plotted. 
                  Pick a date between ", min_date, " and ", max_date, ".")),
       
-      # Break for visual separation
       br(), br(),
       
-      # Date input
       dateInput(inputId = "date",
                 label = "Select date:",
                 value = "2013-01-01",
                 min = min_date, max = max_date)
     ),
     
-    # Output(s)
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create the plot
   output$scatterplot <- renderPlot({
     movies_selected_date <- movies %>%
       filter(thtr_rel_date >= as.POSIXct(input$date))
@@ -984,34 +1014,36 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r ex-2-2d-solution, include = FALSE}
-library(shiny)
-library(dplyr)
-library(ggplot2)
-load("movies.RData")
+# Load packages ----------------------------------------------------------------
 
+library(shiny)
+library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
 min_date <- min(movies$thtr_rel_date)
 max_date <- max(movies$thtr_rel_date)
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
     sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Explanatory text
       HTML(paste0("Movies released between the following dates will be plotted. 
                   Pick dates between ", min_date, " and ", max_date, ".")),
       
-      # Break for visual separation
       br(), br(),
       
-      # Date input
       dateRangeInput(inputId = "date",
                 label = "Select dates:",
                 start = "2013-01-01", end = "2014-01-01",
@@ -1019,17 +1051,16 @@ ui <- fluidPage(
                 startview = "year")
     ),
     
-    # Output(s)
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create the plot
   output$scatterplot <- renderPlot({
     req(input$date)
     movies_selected_date <- movies %>%
@@ -1040,7 +1071,8 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -1238,93 +1270,103 @@ The following app is one you've seen before -- it creates a scatterplot of two v
 :::
 
 ```{r missing, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "critics_score")
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
-                          geom_point()
-}
+    geom_point()
+  
+  }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 
 ```{r missing-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "critics_score")
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
+  
 }
 
-# Create a Shiny app object
+# Create a Shiny app object ----------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -1346,31 +1388,35 @@ In this app, the user selects `x` and `y` variables for the scatterplot. We will
 :::
 
 ```{r render-text, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
+
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "critics_score")
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       textOutput(outputId = "correlation")
@@ -1378,10 +1424,10 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
@@ -1389,40 +1435,44 @@ server <- function(input, output, session) {
   
   # Create text output stating the correlation between the two ploted 
   output$correlation <- ___
-}
 
-# Create a Shiny app object
+  s}
+
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
-
 ```
 
 
 ```{r render-text-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
                   selected = "critics_score")
     ),
     
-    # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       textOutput(outputId = "correlation")
@@ -1430,10 +1480,10 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
@@ -1447,7 +1497,8 @@ server <- function(input, output, session) {
   })
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -1545,120 +1596,118 @@ In addition to brushing, users can also interact with plots via hovering over th
 :::
 
 ```{r hovering, eval = FALSE, echo = TRUE}
-# Load packages
-library(shiny)
-library(tidyverse)
+# Load packages ----------------------------------------------------------------
 
-# Load data
+library(shiny)
+library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
-ui <- fluidPage(
+# Define UI --------------------------------------------------------------------
 
+ui <- fluidPage(
   br(),
-    
-  # Sidebar layout with a input and output definitions
+
   sidebarLayout(
-    # Inputs: Select variables to plot
     sidebarPanel(
-      # Select variable for y-axis
-      selectInput(inputId = "y", label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "audience_score"),
-      # Select variable for x-axis
-      selectInput(inputId = "x", label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "critics_score")
+      selectInput(
+        inputId = "y", label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x", label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      )
     ),
 
-    # Output:
     mainPanel(
-      # Show scatterplot with brushing capability
       plotOutput(outputId = "scatterplot", brush = "plot_brush"),
-      # Show data table
-      dataTableOutput(outputId = "moviestable"),
+      DT::dataTableOutput(outputId = "moviestable"),
       br()
     )
   )
 )
 
-# Define server function required to create the scatterplot
-server <- function(input, output, session) {
+# Define server ----------------------------------------------------------------
 
-  # Create scatterplot object the plotOutput function is expecting
+server <- function(input, output, session) {
+  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
-  
-  # Create data table
+
   output$moviestable <- renderDataTable({
-    brushedPoints(movies, brush = input$plot_brush) %>% 
+    brushedPoints(movies, brush = input$plot_brush) %>%
       select(title, audience_score, critics_score)
   })
-  
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r hover-solution, include = FALSE}
-# Load packages
-library(shiny)
-library(tidyverse)
+# Load packages ----------------------------------------------------------------
 
-# Load data
+library(shiny)
+library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# Define UI for application that plots features of movies
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
-  
   br(),
-  
-  # Sidebar layout with a input and output definitions
+
   sidebarLayout(
-    # Inputs: Select variables to plot
     sidebarPanel(
-      # Select variable for y-axis
-      selectInput(inputId = "y", label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "audience_score"),
-      # Select variable for x-axis
-      selectInput(inputId = "x", label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "critics_score")
+      selectInput(
+        inputId = "y", label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
+      selectInput(
+        inputId = "x", label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      )
     ),
-    
-    # Output:
+
     mainPanel(
-      # Show scatterplot
       plotOutput(outputId = "scatterplot", hover = "plot_hover"),
-      # Show data table
       dataTableOutput(outputId = "moviestable"),
       br()
     )
   )
 )
 
-# Define server function required to create the scatterplot
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
-  
-  # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
-  
-  # Print data table
+
   output$moviestable <- renderDataTable({
-    nearPoints(movies, input$plot_hover) %>% 
+    nearPoints(movies, input$plot_hover) %>%
       select(title, audience_score, critics_score)
   })
-  
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -1682,25 +1731,28 @@ The goal in this exercise is to develop an app where the user selects two variab
 
 
 ```{r text-outputs, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
-library(dplyr)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
@@ -1708,72 +1760,71 @@ ui <- fluidPage(
       
     ),
     
-    # Output(s)
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       ___(outputId = ___) # regression output
       ___(outputId = ___) # avg of x
       ___(outputId = ___) # avg of y
-    
+      
+    )
   )
-)
 
-# Server
+# Define server ----------------------------------------------------------------
+ 
 server <- function(input, output, session) {
-  
-  # Create scatterplot
+    
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
   
-  # Calculate average of x
   output$avg_x <- renderText({
     avg_x <- movies %>% pull(input$x) %>% mean() %>% round(2)
     paste("Average", input$x, "=", avg_x)
   })
   
-  # Calculate average of y
   output$avg_y <- renderText({
     avg_y <- movies %>% pull(input$y) %>% mean() %>% round(2)
     paste("Average", input$y, "=", avg_y)
   })
   
-  # Create regression output
   output$lmoutput <- renderPrint({
     x <- movies %>% pull(input$x)
     y <- movies %>% pull(input$y)
     summ <- summary(lm(y ~ x, data = movies)) 
     print(summ, digits = 3, signif.stars = FALSE)
   })
+    
+  }
   
-}
-
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+  
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r text-outputs-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
-library(dplyr)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
+# Define UI --------------------------------------------------------------------
 
-# UI
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
@@ -1791,28 +1842,25 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
   
-  # Calculate average of x
   output$avg_x <- renderText({
     avg_x <- movies %>% pull(input$x) %>% mean() %>% round(2)
     paste("Average", input$x, "=", avg_x)
   })
   
-  # Calculate average of y
   output$avg_y <- renderText({
     avg_y <- movies %>% pull(input$y) %>% mean() %>% round(2)
     paste("Average", input$y, "=", avg_y)
   })
   
-  # Create regression output
   output$lmoutput <- renderPrint({
     x <- movies %>% pull(input$x)
     y <- movies %>% pull(input$y)
@@ -1821,7 +1869,8 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -1845,25 +1894,28 @@ Combine the values calculated in the previous exercise as described below to cre
 :::
 
 ```{r html, echo = TRUE, eval = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
-library(dplyr)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
@@ -1871,7 +1923,6 @@ ui <- fluidPage(
       
     ),
     
-    # Output(s)
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       textOutput(outputId = "avg_x"), # avg of x
@@ -1881,28 +1932,25 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
   
-  # Calculate average of x
   output$avg_x <- renderText({
     avg_x <- movies %>% pull(input$x) %>% mean() %>% round(2)
     paste("Average", input$x, "=", avg_x)
   })
   
-  # Calculate average of y
   output$avg_y <- renderText({
     avg_y <- movies %>% pull(input$y) %>% mean() %>% round(2)
     paste("Average", input$y, "=", avg_y)
   })
   
-  # Create regression output
   output$lmoutput <- renderPrint({
     x <- movies %>% pull(input$x)
     y <- movies %>% pull(input$y)
@@ -1911,31 +1959,35 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 
 ```{r html-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
-library(dplyr)
 library(ggplot2)
+library(dplyr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select variable for y-axis
       selectInput(inputId = "y",
                   label = "Y-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
                   selected = "audience_score"),
       
-      # Select variable for x-axis
       selectInput(inputId = "x",
                   label = "X-axis:",
                   choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
@@ -1943,7 +1995,6 @@ ui <- fluidPage(
       
     ),
     
-    # Output(s)
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       htmlOutput(outputId = "avgs"),
@@ -1952,16 +2003,15 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
-  # Create scatterplot
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
   
-  # Calculate averages
   output$avgs <- renderUI({
     avg_x <- movies %>% pull(input$x) %>% mean() %>% round(2)
     avg_y <- movies %>% pull(input$y) %>% mean() %>% round(2)
@@ -1970,7 +2020,6 @@ server <- function(input, output, session) {
     HTML(paste(str_x, str_y, sep = '<br/>'))
   })
   
-  # Create regression output
   output$lmoutput <- renderPrint({
     x <- movies %>% pull(input$x)
     y <- movies %>% pull(input$y)
@@ -1979,7 +2028,8 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
@@ -2004,33 +2054,35 @@ Download the selected data with `downloadButton()` using instructions help files
 :::
 
 ```{r download, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
+library(ggplot2)
 library(dplyr)
-library(readr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select filetype
       radioButtons(inputId = "filetype",
                    label = "Select filetype:",
                    choices = c("csv", "tsv"),
                    selected = "csv"),
       
-      # Select variables to download
       checkboxGroupInput(inputId = "selected_var",
-                  label = "Select variables:",
-                  choices = names(movies),
-                  selected = c("title"))
+                         label = "Select variables:",
+                         choices = names(movies),
+                         selected = c("title"))
       
     ),
     
-    # Output(s)
     mainPanel(
       HTML("Select filetype and variables, then hit 'Download data'."),
       ___("download_data", "Download data")
@@ -2038,58 +2090,62 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
   # Download file
   output$___ <- ___(
     filename = function() {
       paste0("movies.", ___)
-      },
+    },
     content = function(file) { 
       if(___ == "csv"){ 
         write_csv(movies %>% select(input$selected_var), file) 
-        }
+      }
       if(___ == "tsv"){ 
         write_tsv(movies %>% select(input$selected_var), file) 
-        }
+      }
     }
   )
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```
 
 ```{r download-solution, include = FALSE}
+# Load packages ----------------------------------------------------------------
+
 library(shiny)
+library(ggplot2)
 library(dplyr)
-library(readr)
+
+# Load data --------------------------------------------------------------------
+
 load("movies.RData")
 
-# UI
+# Define UI --------------------------------------------------------------------
+
 ui <- fluidPage(
   sidebarLayout(
     
-    # Input(s)
     sidebarPanel(
       
-      # Select filetype
       radioButtons(inputId = "filetype",
                    label = "Select filetype:",
                    choices = c("csv", "tsv"),
                    selected = "csv"),
       
-      # Select variables to download
       checkboxGroupInput(inputId = "selected_var",
-                  label = "Select variables:",
-                  choices = names(movies),
-                  selected = c("title"))
+                         label = "Select variables:",
+                         choices = names(movies),
+                         selected = c("title"))
       
     ),
     
-    # Output(s)
     mainPanel(
       HTML("Select filetype and variables, then hit 'Download data'."),
       downloadButton("download_data", "Download data")
@@ -2097,7 +2153,8 @@ ui <- fluidPage(
   )
 )
 
-# Server
+# Define server ----------------------------------------------------------------
+
 server <- function(input, output, session) {
   
   # Download file
@@ -2117,6 +2174,7 @@ server <- function(input, output, session) {
   
 }
 
-# Create a Shiny app object
+# Create the Shiny app object --------------------------------------------------
+
 shinyApp(ui = ui, server = server)
 ```

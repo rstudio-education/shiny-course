@@ -1,6 +1,0 @@
-title: Building Web Applications in R with Shiny
-description: Shiny is an R package that makes it easy to build interactive web apps straight from R. Shiny combines the computational power of R with the interactivity of the modern web. This course will take you from R programmer to Shiny developer. If you want to take a fresh, interactive approach to telling your data story, let users interact with your data and your analysis, and do it all with R, dive in!
-programming_language: r
-from: r-shiny-prod:14
-datasets:
-  movies.Rdata: Movies

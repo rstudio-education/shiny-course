@@ -5,7 +5,7 @@ output:
   learnr::tutorial:
     progressive: true
     allow_skip: true
-    theme: paper
+    theme: NULL
     highlight: tango
     css: css/style.css
     includes:
@@ -16,6 +16,12 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
+library(tidyverse)
+library(shiny)
+library(usethis)
+library(devtools)
+library(rsconnect)
+
 knitr::opts_chunk$set(
   echo = FALSE, 
   fig.align = "center",
@@ -27,7 +33,7 @@ knitr::opts_chunk$set(
 
 ### 
 
-Earlier in the course we mentioned that the ui is ultimately built with HTML. We actually use R functions to make the ui, but they get translated to HTML. 
+Earlier in the course we mentioned that the UI is ultimately built with HTML. We actually use R functions to make the UI, but they get translated to HTML. 
 
 In this module we build on this idea to develop more complex app interfaces. More specifically, we discuss **tags**. 
 
@@ -35,19 +41,17 @@ In this module we build on this idea to develop more complex app interfaces. Mor
 
 Shiny comes with a list of functions saved under tags that allow us to access HTML tags and use them to add static (as opposed to reactive) content to our apps. 
 
-The `tags` object in shiny is a list of 100+ simple functions for constructing HTML documents.  
+The `tags` object in shiny is a list of 100+ simple functions for constructing HTML documents. Each of the elements in this list is a function that maps to an HTML tag.
 
 ```{r, echo = TRUE, eval = TRUE}
 names(tags)
 ```
 
-* Each of the elements in this list is a function that maps to an HTML tag.
-
 ### tag -> HTML
 
 For example, let's use the `b` tag, which is used for bolding text in HTML. The function is `tags$b()`. 
 
-We can pass a text string, in quotation marks, to this function, like "This is my first app". 
+You can pass a text string, in quotation marks, to this function, like "This is my first app". 
 
 ```{r, echo= TRUE, eval = FALSE}
 tags$b("This is my first app")
@@ -68,9 +72,9 @@ tags$b("This is my first app")
 
 ### Header tags
 
-So how would we use these tags in building an app? 
+So how would you use these tags in building an app? 
 
-We might use the various levels of headers if it makes sense for me to have subheadings in my app. 
+You might use the various levels of headers if it makes sense for to have subheadings in my app. 
 
 For example `tags$h1()`, `tags$h2()`, and `tags$h3()` to create first, second, and third level headings, etc. 
 
@@ -84,18 +88,28 @@ ui <- fluidPage(
   tags$h3("Third level heading")
 )
 
-# Define server fn that does nothing :)
+# Define server function that does nothing :)
 server <- function(input, output, session) {}
 
 # Create the app object
 shinyApp(ui = ui, server = server)
 ```
 
-![](images/h1-h2-h3.png){width=50%}
+---
+
+```{r, echo=FALSE}
+fluidPage(
+  tags$h1("First level heading"), 
+  tags$h2("Second level heading"), 
+  tags$h3("Third level heading")
+)
+```
+
+---
 
 ### Linked text
 
-If we have references we want to link to at the bottom of my app, we can use the a tag with the `href` argument for specifying a URL.
+If you have references you want to link to at the bottom of you app, you can use the a tag with the `href` argument for specifying a URL.
 
 ```{r, echo = TRUE, eval = FALSE}
 library(shiny)
@@ -114,23 +128,35 @@ server <- function(input, output, session) {}
 shinyApp(ui = ui, server = server)
 ```
 
-![](images/awesome-title.png){width=50%}
+---
+
+```{r, echo=FALSE}
+fluidPage( 
+  tags$h1("Awesome title"), 
+  tags$br(), # line break 
+  tags$a("This app is built with Shiny.", href = "http://shiny.rstudio.com/")
+)
+```
+
+---
 
 ### Nested tags 
 
-We can also nest tags within each other to create something like a new paragraph with the `p` tag and some text in that paragraph where certain words are italicized with the `em` tag and certain are bolded with the `b` tag.
+You can also nest tags within each other to create something like a new paragraph with the `p` tag and some text in that paragraph where certain words are italicized with the `em` tag and certain are bolded with the `b` tag.
 
 ```{r, echo = TRUE, eval = FALSE}
 library(shiny)
 
 # Define UI with tags
 ui <- fluidPage( 
-  tags$p("Lorem ipsum",
-         tags$em("dolor"), 
-         "sit amet,", 
-         tags$b("consectetur"), 
-         "adipiscing elit.")
-)
+  tags$p(
+    "Lorem ipsum",
+    tags$em("dolor"),
+    "sit amet,",
+    tags$b("consectetur"),
+    "adipiscing elit."
+    )
+  )
 
 # Define server fn that does nothing :)
 server <- function(input, output, session) {}
@@ -139,15 +165,45 @@ server <- function(input, output, session) {}
 shinyApp(ui = ui, server = server)
 ```
 
+---
 
-![](images/nested-tags.png){width=50%}
+```{r, echo=FALSE}
+fluidPage( 
+  tags$p(
+    "Lorem ipsum",
+    tags$em("dolor"),
+    "sit amet,",
+    tags$b("consectetur"),
+    "adipiscing elit."
+  )
+)
+```
 
+---
 
 ### Common tags
 
 Additionally, the most commonly used tags are wrapped in their own functions and you can use them without the tags list. 
 
-<center>![](images/common-tags.png){width=100%}</center>
+```{r eval = FALSE, echo = TRUE}
+tags$p(...)       -> p(...)
+tags$h1(...)      -> h1(...)
+tags$h2(...)      -> h2(...)
+tags$h3(...)      -> h3(...)
+tags$h4(...)      -> h4(...)
+tags$h5(...)      -> h5(...)
+tags$h6(...)      -> h6(...)
+tags$a(...)       -> a(...)
+tags$br(...)      -> br(...)
+tags$div(...)     -> div(...)
+tags$span(...)    -> span(...)
+tags$pre(...)     -> pre(...)
+tags$code(...)    -> code(...)
+tags$img(...)     -> img(...)
+tags$strong(...)  -> strong(...)
+tags$em(...)      -> em(...)
+tags$hr(...)      -> hr(...)
+```
 
 ### 
 
@@ -355,15 +411,14 @@ server <- function(input, output, session) {
 
 # Create a Shiny app object
 shinyApp(ui = ui, server = server)
-
 ```
 
 
-### Add image with img tag
+### Add image with the `img` tag
 
 Now let's practice adding an image to a very simple app.  
 
-Note that if you'd like to use a local image for with your app, you'll first have to save the image in a folder `www/` within your root directory. You'll see what I mean when you run the demo in the RStudio Cloud Project.
+Note that if you'd like to use a local image for with your app, you'll first have to save the image in a folder `www/` within your root directory. You'll see what we mean when you run the demo in the RStudio Cloud Project.
 
 :::proj
 
@@ -405,29 +460,109 @@ One useful function for customizing the layout of your app is `fluidRow()`. This
 
 You can add as many rows as you want, but you want to be careful about expanding your app too much vertically as your users might not be willing to scroll down to interact with your app in full.
 
-<center>
-![](images/04-02-1.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
 
-</center>
+# Define UI with fluid rows
+ui <- fluidPage(
+  "Side", "by", "side", "text",
+  fluidRow("Text on row 1"),
+  fluidRow("Text on row 2"),
+  fluidRow("Text on row 3")
+)
+
+# Define server function that does nothing
+server <- function(input, output, session) {}
+
+# Create the app object
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  "Side", "by", "side", "text",
+  fluidRow("Text on row 1"),
+  fluidRow("Text on row 2"),
+  fluidRow("Text on row 3")
+)
+```
+
+---
 
 ### `column()`
 
 The column function is also incredibly useful. It adds columns within a row, and it requires that you define a width for each column. 
 
-<center>
-![](images/04-02-2.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
 
-</center>
+# Define UI with fluid rows and columns
+ui <- fluidPage(
+  fluidRow(
+    column("R1, C1, width = 3", width = 3),
+    column("R1, C2, width = 9", width = 9)
+  ),
+  fluidRow(
+    column("R2, C1, width = 4", width = 4),
+    column("R2, C2, width = 4", width = 4),
+    column("R2, C3, width = 4", width = 4)
+  )
+)
+
+# Define server function that does nothing
+server <- function(input, output, session) {}
+
+# Create the app object
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  fluidRow(
+    column("R1, C1, width = 3", width = 3),
+    column("R1, C2, width = 9", width = 9)
+  ),
+  fluidRow(
+    column("R2, C1, width = 4", width = 4),
+    column("R2, C2, width = 4", width = 4),
+    column("R2, C3, width = 4", width = 4)
+  )
+)
+```
+
+---
 
 ### The width is relative
 
 The total width of columns within any given row should add up to 12. You can use the columns to place output objects like a plots or summary tables in specific places in your app.
 
-![](images/04-02-3.png){width=100%}
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  strong("3 + 9 = 12"),
+  fluidRow(
+    column(wellPanel("R1, C1", br(), "width = 3"), width = 3),
+    column(wellPanel("R1, C2, width = 9"), width = 9)
+  ),
+  strong("4 + 4 + 4 = 12"),
+  fluidRow(
+    column(wellPanel("R2, C1, width = 4"), width = 4),
+    column(wellPanel("R2, C2, width = 4"), width = 4),
+    column(wellPanel("R2, C3, width = 4"), width = 4)
+  )
+)
+```
+
+---
 
 ### Panels
 
-We can use panels to group multiple elements into a single element that has its own properties.
+You can use panels to group multiple elements into a single element that has its own properties.
 
 This is especially important and useful for complex apps with a large number of inputs and outputs such that it might not be clear to the user where to get started.
 
@@ -435,58 +570,314 @@ This is especially important and useful for complex apps with a large number of 
 
 The `wellpanel()` function groups elements into a grey well, or a box with rounded corners. This is a look you should be used to seeing in shiny apps by now.
 
-![](images/04-02-4.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with wellPanels
+ui <- fluidPage(
+  wellPanel( fluidRow("Row 1") ),
+  wellPanel( fluidRow("Row 2") ),
+  wellPanel( fluidRow("Row 3") )
+)
+
+# Define server function that does nothing
+server <- function(input, output, session) {}
+
+# Create the app object
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  wellPanel( fluidRow("Row 1") ),
+  wellPanel( fluidRow("Row 2") ),
+  wellPanel( fluidRow("Row 3") )
+)
+```
+
+---
 
 ### Panels
 
 Shiny offers 12 different panels, but we'll take a look at a small subset of them in this section, and then you'll get to work with a few others in the exercises that follow.
 
-![](images/04-02-5.png){width=60%}
-
+```{r eval = FALSE}
+absolutePanel(...)
+fixedPanel(...)
+conditionalPanel(...)
+headerPanel(...)
+mainPanel(...)
+navlistPanel(...)
+sidebarPanel(...)
+tabPanel(...)
+tabsetPanel(...)
+titlePanel(...)
+inputPanel(...)
+wellPanel(...)
+```
 
 ### `sidebarPanel()` and `mainPanel()`
 
 We have made heavy use of `sidebarPanel()` and `mainPanel()` in our apps in this course. However we mostly stuck with their default widths. 
 
-![](images/04-02-6.png){width=100%}
+The default width for a `sidebarPanel()` is 4 and for a `mainPanel()` is 8. 
 
-* The default width for a `sidebarPanel()` is 4 and for a `mainPanel()` is 8. 
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with default width sidebar
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      strong("Sidebar"),
+      "Usually inputs go here, width = 4 by default"
+      ),
+    mainPanel(
+      strong("Main panel"),
+      "Usually outputs go here, width = 8 by default"
+      )
+  )
+)
+
+server <- function(input, output, session) {}
+
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      strong("Sidebar"),
+      "Usually inputs go here, width = 4 by default"
+      ),
+    mainPanel(
+      strong("Main panel"),
+      "Usually outputs go here, width = 8 by default"
+      )
+  )
+)
+```
+
+---
+
 
 ### 
-If we wanted to make an app where the `sidebar` and `mainPanel` are of equal width, so the app is split down the middle, we can specify a width argument to the `sidebarPanel()` and `mainPanel()` functions and set each to 6. 
 
-![](images/04-02-7.png){width=100%}
+If you wanted to make an app where the `sidebar` and `mainPanel` are of equal width, so the app is split down the middle, you can specify a width argument to the `sidebarPanel()` and `mainPanel()` functions and set each to 6. 
+
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with default width sidebar
+fluidPage(
+  sidebarLayout(
+    sidebarPanel("Sidebar with width = 6", width = 6),
+    mainPanel("Main panel with width = 6", width = 6)
+  )
+)
+
+server <- function(input, output, session) {}
+
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  sidebarLayout(
+    sidebarPanel("Sidebar with width = 6", width = 6),
+    mainPanel("Main panel with width = 6", width = 6)
+  )
+)
+```
+
+---
 
 ### `titlePanel()`
 
-The `titlePanel()` is used to create a panel containing an application title. Often it makes sense to include this panel outside the `sidebarLayout()`. But in addition to the title on the page, we might want to also change the text that shows up on the browser tab for our app, especially if our title is long. 
+The `titlePanel()` is used to create a panel containing an application title. Often it makes sense to include this panel outside the `sidebarLayout()`. But in addition to the title on the page, youmight want to also change the text that shows up on the browser tab for our app, especially if our title is long. 
 
-![](images/04-02-8.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with title panel
+ui <- fluidPage(
+  titlePanel("My awesome app"),
+  sidebarLayout(
+    sidebarPanel("Some inputs"),
+    mainPanel("Some outputs")
+  )
+)
+
+server <- function(input, output, session) {}
+
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  titlePanel("My awesome app"),
+  sidebarLayout(
+    sidebarPanel("Some inputs"),
+    mainPanel("Some outputs")
+  )
+)
+```
+
+---
 
 ### `titlePanel()` with `windowTitle`
 
-To customize this text we specify the `windowTitle` argument in the `titlePanel()`, which is by default equal to the application title. For example, my application title might be "Movie browser, 1970 to 2014", but I might just want to make my windowTitle "Movies".
+To customize this text you specify the `windowTitle` argument in the `titlePanel()`, which is by default equal to the application title. For example, your application title might be "Movie browser, 1970 to 2014", but you might just want to make your window title "Movies".
 
-![](images/04-02-9.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with title panel and window title
+ui <- fluidPage(
+  titlePanel("Movie browser, 1970 to 2014",
+             windowTitle = "Movies"),
+  sidebarLayout(
+    sidebarPanel("Some inputs"),
+    mainPanel("Some outputs")
+  )
+)
+server <- function(input, output, session) {}
+
+shinyApp(ui = ui, server = server)
+```
+
+---
+
+```{r eval = TRUE, echo = FALSE}
+fluidPage(
+  titlePanel("Movie browser, 1970 to 2014",
+             windowTitle = "Movies"),
+  sidebarLayout(
+    sidebarPanel("Some inputs"),
+    mainPanel("Some outputs")
+  )
+)
+```
+
+---
 
 ### `conditionalPanel()`
 
 The last panel we'll consider is `conditionalPanel()`, which creates a panel that is visible conditional upon the value of an input or an output. 
 
-![](images/04-02-10.png){width=80%}
+First, let's see it in action in the app below. Switch between *any* and *selected* number of digits to see how the sidebar panel changes.
 
-![](images/04-02-11.png){width=80%}
+---
 
+```{r}
+fluidPage(
+  titlePanel("Random number generator"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        "digit_type", "Number of digits:",
+        c("any", "selected")
+      ),
+      conditionalPanel(
+        condition = "input.digit_type == 'selected'",
+        sliderInput("digit_count", "How many digits?",
+          min = 1, max = 10, value = 4
+        )
+      ),
+      actionButton("go", "Generate new random number"),
+      width = 5
+    ),
+    mainPanel(
+      br(),
+      "Your random number is",
+      h4(textOutput("random_number")),
+      width = 7
+    )
+  )
+)
+```
 
-![](images/04-02-12.png){width=80%}
+```{r context = "server"}
+output$random_number <- renderText({
+  input$go
+  raw <- runif(1)
+  digits <- if (input$digit_type == "any") {
+    sample(1:10, size = 1)
+  } else {
+    input$digit_count
+  }
+  round(raw * 10^digits)
+})
+```
 
-* Under the hood this function evaluates a JavaScript expression once at startup and then whenever Shiny detects a relevant change or input/output. 
+---
 
-* Being able to display panels conditional on previous user selections is a powerful feature of Shiny. 
+### 
 
-Next, we'll learn about tabs and tabset panels. Let's get to it!
+And here is the code that creates the app with the conditional panel.
+
+Under the hood this function evaluates a JavaScript expression once at startup and then whenever Shiny detects a relevant change or input/output. 
+
+Being able to display panels conditional on previous user selections is a powerful feature of Shiny. 
+
+```{r echo = TRUE, eval = FALSE}
+library(shiny)
+
+# Define UI with conditionalPanel
+ui <- fluidPage(
+  titlePanel("Random number generator"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(
+        "digit_type", "Number of digits:",
+        c("any", "selected")
+      ),
+      conditionalPanel(
+        condition = "input.digit_type == 'selected'",
+        sliderInput("digit_count", "How many digits?",
+          min = 1, max = 10, value = 4
+        )
+      ),
+      actionButton("go", "Generate new random number"),
+      width = 5
+    ),
+    mainPanel(
+      br(),
+      "Your random number is",
+      h4(textOutput("random_number")),
+      width = 7
+    )
+  )
+)
+
+# Define server logic that generates a random number based on user input
+server <- function(input, output, session) {
+  output$random_number <- renderText({
+    input$go
+    raw <- runif(1)
+    digits <- if (input$digit_type == "any") {
+      sample(1:10, size = 1)
+    } else {
+      input$digit_count
+    }
+    round(raw * 10^digits)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
 
 ## 4.3 Tabs and tabset panels
+
 ###
 
 If the amount of information you want to communicate to your users does not fit well on a page, or there is detailed information, like raw data, that you want to make available to your users but not necessarily feature prominently in your app, you can make use of tabs to distribute this information to stackable tab panels.
@@ -495,38 +886,106 @@ If the amount of information you want to communicate to your users does not fit 
 
 Tabsets are created by calling the `tabsetPanel()` function with a list of tabs created by `tabPanel()`.
 
-![](images/04-03-1.png){width=100%}
+Each tab panel has a unique title and a list of output elements which are rendered vertically within the tab. 
+
+In this example we display 
+
+- a plot of our data in the first tab, 
+- summary statistics in the second tab,
+- raw data in the third tab, 
+- and some background information on our dataset in the fourth tab.
 
 
-### `tabPanel()`
-Each tab panel has a unique title and a list of output elements which are rendered vertically within the tab. In this  example we display a plot of our data in the first tab, 
+```{r echo = TRUE, eval = FALSE}
+mainPanel(
+  tabsetPanel(
+    type = "tabs",
+    tabPanel("Plot", plotOutput("plot")),
+    tabPanel("Summary", tableOutput("summary")),
+    tabPanel("Data", DT::dataTableOutput("data")),
+    tabPanel("Reference", 
+             tags$p("There data were obtained from",
+                    tags$a("IMDB", href = "http://www.imdb.com/"), "and",
+                    tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."),
+             tags$p("The data represent", nrow(movies), 
+                    "randomly sampled movies released between 1972 to 2014 in the United States.")
+    )
+  )
+)
+```
 
-![](images/04-03-2.png){width=100%}
+---
+
+```{r context = "data"}
+load("movies.RData")
+```
 
 
-### 
-summary statistics in the second tab,
+```{r}
+fluidPage(
 
-![](images/04-03-3.png){width=100%}
+  titlePanel("Movie browser, 1970 to 2014", windowTitle = "Movies"),
 
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput(
+        inputId = "type",
+        label = "Title type:",
+        choices = levels(movies$title_type),
+        selected = "Feature Film"
+      )
+    ),
 
-### 
-raw data in the third tab, 
+    mainPanel(
+      tabsetPanel(
+        type = "tabs",
+        tabPanel("Plot", plotOutput("plot")),
+        tabPanel("Summary", tableOutput("summary")),
+        tabPanel("Data", DT::dataTableOutput("data")),
+        tabPanel(
+          "Reference", tags$p(
+            "There data were obtained from",
+            tags$a("IMDB", href = "http://www.imdb.com/"), "and",
+            tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+          ),
+          tags$p("The data represent ", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the Unites States.")
+        ) 
+      )
+    )
+  )
+)
+```
 
-![](images/04-03-4.png){width=100%}
+```{r context = "server"}
+movies_subset <- reactive({
+  movies %>%
+    filter(title_type %in% input$type)
+})
 
+output$plot <- renderPlot({
+  ggplot(movies_subset(), aes(x = critics_score, y = audience_score, color = mpaa_rating)) +
+    geom_point()
+ })
 
-### 
-and some background information on our dataset in the fourth tab.
+output$summary <- renderTable({
+  movies_subset() %>%
+    group_by(mpaa_rating) %>%
+    summarise(mean_as = mean(audience_score), sd_as = sd(audience_score),
+              mean_cs = mean(critics_score), sd_cs = sd(critics_score),
+              n = n(), cor = cor(audience_score, critics_score))
+}, digits = 3)
 
-![](images/04-03-5.png){width=100%}
+output$data <- DT::renderDataTable({
+  movies_subset() %>%
+    DT::datatable(options = list(pageLength = 10), rownames = FALSE)
+})
+```
 
+---
 
 ### Tabs and reactivity
 
-Note that in the previous example the user first selected a sample of the data. Then this new sampled data got used in four separate tabs.
-
-![](images/04-03-6.png){width=100%}
+Note that in the previous example the user first selected a subset of the data, `movies_subset()`, then this new sampled data got used in four separate tabs.
 
 Introducing tabs into our user interface underlines the importance of creating reactive expressions for shared data.   
 
@@ -538,22 +997,102 @@ Instead, we calculate the data once in a reactive expression, and then have the 
 
 Another option for laying out tabs is using the `navlistpanel()`, which lists the tabs vertically down the side, as opposed to horizontally across the screen.
 
-![](images/04-03-7.png){width=100%}
+```{r echo = TRUE, eval = FALSE}
+mainPanel(
+  navlistPanel(
+    tabPanel("Plot", plotOutput("plot")),
+    tabPanel("Summary", tableOutput("summary")),
+    tabPanel("Data", DT::dataTableOutput("data")),
+    tabPanel(
+      "Reference",
+      tags$p(
+        "There data were obtained from",
+        tags$a("IMDB", href = "http://www.imdb.com/"), "and",
+        tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+      ),
+      tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States.")
+    )
+  )
+)
+```
+
+---
+
+```{r}
+fluidPage(
+
+  titlePanel("Movie browser, 1970 to 2014", windowTitle = "Movies"),
+
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput(
+        inputId = "type",
+        label = "Title type:",
+        choices = levels(movies$title_type),
+        selected = "Feature Film"
+      )
+    ),
+
+    mainPanel(
+      navlistPanel(
+        tabPanel("Plot", plotOutput("plot2")),
+        tabPanel("Summary", tableOutput("summary2")),
+        tabPanel("Data", DT::dataTableOutput("data2")),
+        tabPanel(
+          "Reference",
+          tags$p(
+            "There data were obtained from",
+            tags$a("IMDB", href = "http://www.imdb.com/"), "and",
+            tags$a("Rotten Tomatoes", href = "https://www.rottentomatoes.com/"), "."
+          ),
+          tags$p("The data represent", nrow(movies), "randomly sampled movies released between 1972 to 2014 in the United States.")
+        )
+      )
+    )
+  )
+)
+```
+
+```{r context = "server"}
+movies_subset2 <- reactive({
+  movies %>%
+    filter(title_type %in% input$type)
+})
+
+output$plot2 <- renderPlot({
+  ggplot(movies_subset(), aes(x = critics_score, y = audience_score, color = mpaa_rating)) +
+    geom_point()
+ })
+
+output$summary2 <- renderTable({
+  movies_subset2() %>%
+    group_by(mpaa_rating) %>%
+    summarise(mean_as = mean(audience_score), sd_as = sd(audience_score),
+              mean_cs = mean(critics_score), sd_cs = sd(critics_score),
+              n = n(), cor = cor(audience_score, critics_score))
+}, digits = 3)
+
+output$data2 <- DT::renderDataTable({
+  movies_subset2() %>%
+    DT::datatable(options = list(pageLength = 10), rownames = FALSE)
+})
+```
 
 ### Tabs
 
 To recap, we use tab panels to create stackable panels, and use `tabsetPanel()` or `navlistPanel()` to arrange the tabs with a navigation across the page or down the side of the page.
 
-<center> ![](images/04-03-8.png){width=80%} </center>
-
+## 4.4 Theming
 
 ### shinythemes
 
 There are many other ways of customizing the look of your app, including using custom CSS. However one quick and easy way of changing the look is using the prebuilt themes in the `shinythemes` package. 
 
-<center> ![](images/04-03-9.png){width=90%} </center>
+In order to use one of these themes, you need to load the `shinythemes` package first. The package website has thumbnail images of each of the themes, but it can be difficult to tell exactly how the theme will look on your app. 
 
-In order to use one of these themes, we need to load the `shinythemes` package first. The package website has thumbnail images of each of the themes, but it can be difficult to tell exactly how the theme will look on your app. 
+```{r out.width = "100%"}
+knitr::include_graphics("images/shinythemes.png")
+```
 
 ### `themeSelector()`
 
@@ -561,15 +1100,30 @@ A useful tool for browsing  themes is the `themeSelector()` widget. To use this 
 
 It can be inserted anywhere inside of the application, although if it is put inside a tab, it will be visible only when that tab is showing. I usually place it right underneath the `fluidPage()` definition. 
 
-![](images/04-03-10.png){width=90%}
-
 This widget is to be used in development only. Once you decide on a theme, you should remove the widget and just define the theme you want using the `shinytheme()` function.
 
+```{r eval = FALSE, echo = TRUE}
+fluidPage(
+  shinythemes::themeSelector(),
+  ...
+)
+```
+
+```{r out.width = "100%"}
+knitr::include_graphics("images/themeselector.png")
+```
+
+### Other theming options
+
+- The [bslib](https://rstudio.github.io/bslib/) package provides tools for customizing [Bootstrap themes](https://getbootstrap.com/docs/4.6/getting-started/theming/) directly from R, making it much easier to customize the appearance of Shiny apps & R Markdown documents.
+
+- The [thematic](https://rstudio.github.io/thematic/) package provides a functionality for simplified theming of ggplot2, lattice, and {base} R graphics as well as automatic theming of these plots within a Shiny app.
+
 ### 
+
 Next up you get to build an app with tabs and see how it looks with different shiny themes.
 
-
-## 4.3 Practice
+## 4.4 Practice
 
 ### Customize the appearance of your app with shinythemes
 
@@ -579,18 +1133,18 @@ https://rstudio.github.io/shinythemes/
 
 :::proj
 
-*Complete the exercise by navigating to the RStudio Cloud Project titled __4-3 Customize the appearance of your app with shinythemes__ in your RStudio Workspace*
+*Complete the exercise by navigating to the RStudio Cloud Project titled __4-4 Customize the appearance of your app with shinythemes__ in your RStudio Workspace*
 
 [<i class="fa fa-cloud"></i> Go to RStudio Cloud Project](https://rstudio.cloud/spaces/81721/join?access_code=I4VJaNsKfTqR3Td9hLP7E1nz8%2FtMg6Xbw9Bgqumv){.btn .test-drive}
 
 :::
 
 
-## 4.4 Congratulations!
+## 4.5 Congratulations!
 
 You now know how to get started with building web apps in R with Shiny! 
 
-### What did we learn?
+### What did youlearn?
 
 In this course you have learned:
 
@@ -599,7 +1153,7 @@ In this course you have learned:
 * You also got practice with customizing your app's UI
 * Employing reactivity best practices
 
-I hope you enjoyed the course and that the topics we discussed in this course motivated you to build your first, and second, and third Shiny app! 
+We hope you enjoyed the course and that the topics we discussed in this course motivated you to build your first, and second, and third Shiny app! 
 
 Once you build your first app, you have a variety of deployment options.
 
@@ -613,11 +1167,10 @@ If you prefer to build your own server you can use Shiny Server, which is free a
 
 ### Pro options
 
-RStudio also offers two Pro options for deploying your apps: Shiny Server Pro and RStudio Connect. You can find out more about all of these options at https://shiny.rstudio.com/deploy.
+RStudio also offers a professional option for deploying your apps: RStudio Connect. You can find out more about all of these options at https://shiny.rstudio.com/deploy.
 
 ### Congratulations!
 
-What we covered in this course is just the tip of the Shiny iceberg, so I hope you decide to dive deeper to learn more. 
+What we covered in this course is just the tip of the Shiny iceberg, so we hope you decide to dive deeper to learn more. 
 
 We can't wait to see the apps you create online! 
-
