@@ -1,0 +1,445 @@
+/*-------- Google font imports --------*/
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap');
+
+/* Navbar */
+
+.navbar-header {
+  padding-right: 15px !important;
+}
+
+.navbar {
+  box-shadow: none;
+  border-bottom: 1pt solid #cccccc66;
+}
+
+
+/*-------- Background color & body font --------*/
+
+body, button, input, textarea {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+
+body {
+  background-color: #ffffff;
+  color: #404040;
+  font-size: 19px !important;
+  line-height: 1.6em;
+}
+
+/*-------- White Space --------*/
+
+.topicsPositioner {
+  width: 90%;
+}
+
+.band {
+  margin-top: 3em;
+}
+
+div.section {  /* so anchorized headers have breathing room above */
+  padding-top: 4em;
+  margin-top: -3em;
+}
+
+h2 {
+  margin-bottom: 1.1em;
+}
+
+h3 {
+  margin-bottom: 1em;
+}
+
+.sourceCode {
+  margin-top: 1.5em;
+}
+
+
+.topics {
+  margin-top: 3em;
+  padding-left: 4em;
+}
+
+.section h3 {
+  padding-top: 90px;
+  margin-top: -69px;
+}
+
+
+
+/* Remove extra space on mobile */
+
+@media screen and (max-width: 767px) {
+
+  div.section {
+    padding-top: 1em;
+    margin-top: -0.5em;
+  }
+
+  .topicsContainer{
+      width: 1%;
+      min-width: 1px;
+      margin-right: 0;
+  }
+
+  .topics {
+      padding-top: 1em;
+      width: 99% !important;
+      border-left: none !important;
+      padding-left: 0;
+  }
+}
+
+
+/*-------- Content / Main Panel ---------*/
+
+.topics {
+    width: 80%;
+    padding-bottom: 600px;
+    background-color: white;
+    border-left: 1pt solid #cccccc66;
+}
+
+/*--------- Headers ---------*/
+
+h1, h2, h3 {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: normal;
+  letter-spacing: 1.5pt;
+}
+
+h1 {
+  color: #2e5d7b;
+}
+
+h2 {
+  font-size: 1.5em;
+  color: #25527d;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.3em;
+  color: #2e5d7b; /*RStudio orange #2e5d7b */
+  font-weight: 600;
+  text-transform: none;
+}
+
+h4 {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  color: #35262690;
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+}
+
+h5 {
+  font-family: 'Source Sans Pro', sans-serif;
+  color: #1a162d99;
+  text-transform: none;
+}
+
+h2 code,
+h3 code {
+  text-transform: none;
+  font-size: 100%;
+  background-color: #e8e8e830;
+}
+
+
+/* Side Panel Start Over Button */
+
+.topicsFooter .resetButton {
+  display: block;
+  max-width: 41%;
+  padding: 8px 10px;
+  /* background-color: #eab0c46b; */
+  /*border: solid 1pt #757373;*/
+  color: #757373;
+  font-size: 12px;
+  letter-spacing: 1pt;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  margin: 0 auto;
+  margin-top: 1em;
+  border-radius: 3px;
+  opacity: 1;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+.topicsFooter .resetButton:hover {
+  border: solid 1pt #2e5d7b;
+  color: #2e5d7b;
+}
+
+
+
+/* Code */
+
+pre {
+  font-size: 15px;
+}
+
+/*------- In line code aesthetic --------*/
+code {
+  color: #575757;
+  background-color: #4040400f;
+
+}
+
+code.sourceCode {
+  white-space: pre-wrap;
+}
+
+/*------- Hyperlinks --------*/
+
+a,
+a:hover,
+a:focus {
+  color: #2e5d7b;
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/*------- Sidebar/Main Menu -------*/
+
+/*--Title--*/
+
+h2.tutorialTitle,
+.topicsHeader h2.tutorialTitle {
+  font-size: 1.7em;
+  font-weight: 400;
+  color: #1a3c5d; /*navy #184876*/
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+  margin-bottom: 0.9em;
+}
+
+/*--Name, Date etc.--*/
+
+#doc-metadata {
+  margin-bottom: 1.5em;
+  padding-bottom: 1.5em;
+  border-bottom: solid 1pt #cccccc68;
+}
+
+#doc-metadata h3,
+#doc-metadata h4 {
+  text-transform: uppercase;
+  letter-spacing: 2pt;
+  line-height: 1.6em;
+}
+
+#doc-metadata h3.subtitle {
+  font-size: 0.8em;
+  color: #40404099;
+  font-weight: normal;
+  letter-spacing: 1pt;
+}
+
+.topicsContainer {
+  width: 20%;
+}
+
+/* sidebar item */
+
+.topicsList .topic {
+  color: #757373;
+  font-size: 16px;
+  letter-spacing: 1pt;
+  line-height: 1.25em;
+  padding: 0.75em 0;
+  background-image: none;
+  /*border-left: 2px solid white;*/
+  border-bottom: none;
+}
+
+/*--- When hovering ---*/
+
+.topicsList .topic:hover {
+    background-color: white;
+    color: #040100;
+    /* border-left: 2px solid #00008040;*/
+}
+
+/*------- Selected menu item -------*/
+
+.topicsList .topic.current {
+    background-color: white;
+    color: #112d47;
+    /*border-left: 2px solid #000080;*/
+}
+
+/* CODE WINDOWS */
+
+/*------- Solution / Hint buttons -------*/
+.tutorial-exercise-input .btn-tutorial-solution {
+    margin-left: 15px;
+    background-color: #bd2a62;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    border: 0;
+    text-shadow: none;
+}
+
+/*------- Solution popover --------*/
+.popover-title {
+    margin: 0;
+    padding: 8px 14px;
+    font-size: 14px;
+    background-color: #bd2a62;
+    border-bottom: 1px solid #ebebeb;
+    border-radius: 5px 5px 0 0;
+    color: white;
+    text-shadow: none;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+/*------- BUTTONS -------*/
+
+.btn {
+  border-radius: 3px;
+}
+
+.proj .btn {
+  drop-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+.topicActions .btn-primary,
+.topicActions .btn-success,
+.topicActions .btn-info,
+.topicActions .btn-xs,
+.topicActions .btn-default {
+    background-image: none;
+    border: 0;
+    text-shadow: none;
+    letter-spacing: 1pt;
+}
+
+.topicActions .btn-primary,
+.topicActions .btn-primary:active,
+.topicActions .btn-primary:focus {
+  color: white;
+  background-color: #75aadb;
+}
+
+.btn:focus {
+outline-offset: 0;
+}
+
+.btn-primary:hover {
+  background-color: #75aadb99 !important;
+}
+
+/*------- Buttons when hovering -------*/
+
+.topicActions .btn-default:hover,
+.topicActions .btn-primary:hover {
+  background-color: #75aadb99;
+  color: white;
+}
+
+
+a.test-drive:hover {
+  color: white !important;
+}
+
+/* RStudio Cloud Project Buttons */
+
+.test-drive {
+  background-color: #75aadb;
+  color: #fcfcfc;
+  border: 1pt solid #75aadb;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 auto 1.5em auto;
+  border-radius: 3px;
+  display: block;
+  width: 45%;
+  white-space: pre-wrap;
+}
+
+.test-drive p {
+  margin: 0;
+}
+
+/* Darker background on mouse-over */
+.test-drive:hover {
+  background-color: #4e80af;
+  border: 1pt solid #75aadb;
+}
+  
+.test-drive a:hover{
+  text-decoration: none;
+}
+
+.proj {
+  background-color: #75aadb10;
+  border: #75aadb50 solid 1px;
+  color: #306aa0;
+  padding: 1em;
+  width: 100%;
+  margin: 1em auto 0.5em;
+  text-align: center;
+}
+
+.proj {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* Copy to Clipboard */
+
+.copy {
+  width: inherit;
+  background-color: #194977 ;
+  border: none;
+  border-radius: 2px;
+  float: right;
+  font-size: 60%;
+  padding: 4px 4px 4px 4px;
+}
+
+/* pkgdown clipboard */
+
+.hasCopyButton {
+  position: relative;
+}
+
+.btn-copy-ex {
+  position: absolute;
+  right: 0;
+  top: 0;
+  visibility: hidden;
+}
+
+.hasCopyButton:hover button.btn-copy-ex {
+  visibility: visible;
+}
+
+/* Alerts */
+
+.alert-success {
+  background-color: #009688;
+}
+
+.alert-danger {
+  background-color: #e1704c;
+}
+
+
+.btn-primary,
+.btn-primary:focus,
+input[type="radio"]:before, .radio input[type="radio"]:before, .radio-inline input[type="radio"]:before {
+    background-color: #4879a7; /* Navy-ish */
+}
