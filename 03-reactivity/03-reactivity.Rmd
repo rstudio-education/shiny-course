@@ -66,12 +66,12 @@ It can both be a dependent (i.e be a child) and have dependents (i.e. be a paren
 knitr::include_graphics("images/input-expression-outputs.png")
 ```
 
-```{r mc-parents-children, echo=FALSE}
+```{r mc-1, echo=FALSE}
 question("Which of the following is false? Select all that apply.",
   answer("Reactive inputs can only be parents."),
   answer("Reactive inputs can only be children.", correct = TRUE),
   answer("Reactive expressions can be parents."),
-  answer("Reactive expressions can be children."), 
+  answer("Reactive expressions can be children."),
   answer("Reactive outputs can be parents.", correct = TRUE),
   answer("Reactive outputs can be children"),
   allow_retry = TRUE
@@ -219,7 +219,7 @@ Extend app by adding reactive data frame, which is a subset, that is used in the
 
 :::
 
-```{r 3-1-reactive, echo = TRUE, eval = FALSE}
+```{r ex-3-1-reactive, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -295,7 +295,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r 3-1-reactive-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-1-reactive-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -372,16 +377,18 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 ```
+</details>
+
 
 ### Identify reactive objects
 
-```{r mc-component, echo=FALSE}
+```{r mc-2, echo=FALSE}
 question("The `movies_selected()` reactive expression from the previous exercise is a...",
   answer("Reactive input"),
   answer("Reactive expression", correct = TRUE),
   answer("Reactive output"),
-  answer("Reactive paradigm"), 
-  allow_retry = TRUE, 
+  answer("Reactive paradigm"),
+  allow_retry = TRUE,
   try_again = "Try again -- does it have children? Does it have parents? Does it have both?"
 )
 ```
@@ -404,8 +411,7 @@ While functions and reactives help accomplish similar goals in terms of not-repe
 
 - Each time you call a function, R will evaluate it.
 
-- However reactive expressions are lazy, they only get executed when their input changes. 
-  - This means that even if you call a reactive expression multiple times in your app, it will only re-execute when its inputs change.
+- However reactive expressions are lazy, they only get executed when their input changes. This means that even if you call a reactive expression multiple times in your app, it will only re-execute when its inputs change.
 
 ### Reactlog
 
@@ -452,7 +458,7 @@ Debug the app, making sure reactives are being used correctly.
 :::
 
 
-```{r 3-2a-debug-reactives, eval = FALSE, echo = TRUE}
+```{r ex-3-2a-debug-reactives, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -565,7 +571,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r 3-2a-debug-reactives-solution, echo = FALSE, eval = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-2a-debug-reactives-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -680,6 +691,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Find inconsistencies in what the app is reporting
 
@@ -698,7 +710,7 @@ In this exercise we go on a hunt for mismatched used of reactives.
 
 :::
 
-```{r 3-2b-inconsistencies, eval = FALSE, echo = TRUE}
+```{r ex-3-2b-inconsistencies, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -810,8 +822,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r 3-2b-inconsistencies-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-2b-inconsistencies-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -923,6 +939,8 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 ```
+
+</details>
 
 ## 3.3 Reactives and observers
 
@@ -1119,7 +1137,7 @@ In the following app, the user, in addition to controlling which variables are p
 
 :::
 
-```{r 3-4a-isolate, eval = FALSE, echo = TRUE}
+```{r ex-3-4a-isolate, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1216,8 +1234,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r 3-4a-isolate-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-4a-isolate-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1316,6 +1338,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Delay with `eventReactive()`
 
@@ -1333,7 +1356,7 @@ Modify the app such that the title is updated only when a button titled "Update 
 
 :::
 
-```{r 3-4b-eventReactive, eval = FALSE, echo = TRUE}
+```{r ex-3-4b-eventReactive, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1430,8 +1453,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r 3-4b-eventReactive-solution, include = FALSE, eval = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-4b-eventReactive-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1540,6 +1567,8 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
+
 ### Trigger with `observeEvent()`
 
 In this app we want two things to happen when an action button is clicked: 
@@ -1560,7 +1589,7 @@ In this app we want two things to happen when an action button is clicked:
 
 :::
 
-```{r 3-4c-trigger, eval = FALSE, echo = TRUE}
+```{r ex-3-4c-trigger, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1616,8 +1645,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r 3-4c-trigger-solution, echo = FALSE, eval = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-4c-trigger-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1673,15 +1706,16 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Difference between `eventReactive()` and `observeEvent()`
 
-```{r diff, echo=FALSE}
+```{r mc-3, echo=FALSE}
 question("Which of the following is false?",
   answer("`observeEvent()` is used to perform an action in response to an event"),
   answer("`isolate()` is used to trigger a reaction", correct = TRUE),
   answer("`eventReactive()` is used to create a calculated value that only updates in response to an event"),
-  answer("Recalculating a value does not generally count as performing an action"), 
+  answer("Recalculating a value does not generally count as performing an action"),
   allow_retry = TRUE
 )
 ```
@@ -1854,7 +1888,7 @@ What's wrong with this? Fix it.
 
 :::
 
-```{r 3-5-mult3, echo = TRUE, eval = FALSE}
+```{r ex-3-5-mult3, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1884,7 +1918,12 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-```{r 3-5-mult3-solution, echo = FALSE, eval = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-3-5-mult3-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1916,3 +1955,5 @@ server <- function(input, output, session) {
 # Create the Shiny app ---------------------------------------------------------
 shinyApp(ui = ui, server = server)
 ```
+
+</details>
