@@ -43,13 +43,13 @@ Three components of reactive execution in Shiny are
 
 We're going to denote them with these symbols:
 
-```{r out.width = "60%"}
+```{r image-input-expression-output, out.width = "60%"}
 knitr::include_graphics("images/input-expression-output.png")
 ```
 
 ### Reactive inputs and outputs
 
-```{r out.width = "40%"}
+```{r image-input-output, out.width = "40%"}
 knitr::include_graphics("images/input-output.png")
 ```
 
@@ -62,7 +62,7 @@ knitr::include_graphics("images/input-output.png")
 A **reactive expressions** is component between an input and an output.  
 It can both be a dependent (i.e be a child) and have dependents (i.e. be a parent).
 
-```{r out.width = "40%"}
+```{r image-input-expression-outputs, out.width = "40%"}
 knitr::include_graphics("images/input-expression-outputs.png")
 ```
 
@@ -82,7 +82,7 @@ question("Which of the following is false? Select all that apply.",
 
 To illustrate reactivity we're going to start with this app once again
 
-```{r}
+```{r image-app-selectinput-scatterplot}
 knitr::include_graphics("images/app-selectinput-scatterplot.png")
 ```
 
@@ -94,24 +94,26 @@ And end up with an app that...
 * updates the plot for those selected movie types
 * and display some text noting the number of movies in the selection
 
-```{r}
+```{r image-app-scatterplot-text}
 knitr::include_graphics("images/app-scatterplot-text.png")
 ```
 
-The subsetted movies dataframe gets used in two places, plot and text outputs. Hence, we we're going to make use of reactive expressions to build this app.
+The subsetted movies data frame gets used in two places, plot and text outputs. Hence, we we're going to make use of reactive expressions to build this app.
 
 ### 1. **ui:** Add a UI element for the user to select which movie type(s) of moves they want to plot with `selectInput()`.
 
-```{r out.width = "10%", fig.align = "left"}
+```{r image-input, out.width = "10%", fig.align = "left"}
 knitr::include_graphics("images/input.png")
 ```
 
-```{r eval = FALSE, echo = TRUE}
+```{r snippet-selectInput, eval = FALSE, echo = TRUE}
 # Select which types of movies to plot
-selectInput(inputId = "selected_type", 
-            label = "Select movie type:",
-            choices = levels(movies$title_type), 
-            selected = "Feature Film")
+selectInput(
+  inputId = "selected_type",
+  label = "Select movie type:",
+  choices = levels(movies$title_type),
+  selected = "Feature Film"
+)
 ```
 
 - We define an `inputId()` that we'll use to refer to the input element to later in the app 
@@ -123,11 +125,11 @@ selectInput(inputId = "selected_type",
 
 Next, we filter for selected title type and save the new data frame as a reactive expression using the `reactive()` function.
 
-```{r out.width = "10%", fig.align = "left"}
+```{r image-expression, out.width = "10%", fig.align = "left"}
 knitr::include_graphics("images/expression.png")
 ```
 
-```{r echo = TRUE, eval = FALSE}
+```{r snippet-movies_subset, echo = TRUE, eval = FALSE}
 # Create a subset of data filtering for chosen title types
 movies_subset <- reactive({
   req(input$selected_type)
@@ -146,15 +148,14 @@ Two more things to note here:
 
 The next two steps could happen in either order. Let’s start with the plot first.
 
-```{r out.width = "10%", fig.align = "left"}
+```{r image-output-1, out.width = "10%", fig.align = "left"}
 knitr::include_graphics("images/output.png")
 ```
 
-```{r echo = TRUE, eval = FALSE}
+```{r snippet-scatterplot, echo = TRUE, eval = FALSE}
 # Create scatterplot
-output$scatterplot <- renderPlot({ 
-  ggplot(data = movies_subset(),
-         aes_string(x = input$x, y = input$y)) + 
+output$scatterplot <- renderPlot({
+  ggplot(data = movies_subset(),aes_string(x = input$x, y = input$y)) +
     geom_point()
 })
 ```
@@ -163,13 +164,13 @@ You should be familiar with creating plots using the `renderPlot()` function by 
 
 ### 3. **ui** & **server:** Use movies_subset (which is reactive) for printing number of observations.
 
-```{r out.width = "10%", fig.align = "left"}
+```{r image-output-2, out.width = "10%", fig.align = "left"}
 knitr::include_graphics("images/output.png")
 ```
 
 And lastly we create the text stating the number of observations in the selection. The obvious choice for creating this output would be `renderText()`. But I feel like getting a little fancier with this one. Suppose we know a bit of HTML -- which is true, I really only know a bit of HTML -- and I want to use some text decoration, like bolding and line breaks in my text output. So we need a rendering function that generates HTML, which is `renderUI()`.
 
-```{r echo = TRUE, eval = FALSE}
+```{r snippet-uiOutput, echo = TRUE, eval = FALSE}
 # ui - Lay out where text should appear on app
 mainPanel( 
   ...
@@ -179,13 +180,15 @@ mainPanel(
 )
 ```
 
-```{r echo = TRUE, eval = FALSE}
+```{r snippet-renderUI, echo = TRUE, eval = FALSE}
 # server - Print number of movies plotted
 output$n <- renderUI({
-  HTML(paste0("The plot displays the relationship between the <br>
-              audience and critics' scores of <br>", 
-              nrow(movies_subset()),
-              " <b>", input$selected_type, "</b> movies."))
+  HTML(paste0(
+    "The plot displays the relationship between the <br>
+              audience and critics' scores of <br>",
+    nrow(movies_subset()),
+    " <b>", input$selected_type, "</b> movies."
+  ))
 })
 ```
 
@@ -420,7 +423,7 @@ To view the reactlog:
 
 The reactlog for the app we developed in the previous section looks like this. It uses the icons for reactive inputs, expressions, and outputs that we saw earlier in the course.
 
-```{r}
+```{r image-reactlog}
 knitr::include_graphics("images/reactlog.png")
 ```
 
@@ -710,47 +713,61 @@ load("movies.RData")
 
 ui <- fluidPage(
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "critics_score"),
-      
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title Type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA Rating" = "mpaa_rating", 
-                              "Critics Rating" = "critics_rating", 
-                              "Audience Rating" = "audience_rating"),
-                  selected = "mpaa_rating"),
-      
-      checkboxGroupInput(inputId = "selected_type",
-                         label = "Select movie type(s):",
-                         choices = c("Documentary", "Feature Film", "TV Movie"),
-                         selected = "Feature Film"),
-      
-      numericInput(inputId = "n_samp", 
-                   label = "Sample size:", 
-                   min = 1, max = nrow(movies), 
-                   value = 3)
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      checkboxGroupInput(
+        inputId = "selected_type",
+        label = "Select movie type(s):",
+        choices = c("Documentary", "Feature Film", "TV Movie"),
+        selected = "Feature Film"
+      ),
+
+      numericInput(
+        inputId = "n_samp",
+        label = "Sample size:",
+        min = 1, max = nrow(movies),
+        value = 3
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       uiOutput(outputId = "n")
@@ -761,32 +778,31 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
+
   # Create a subset of data filtering for selected title types
   movies_subset <- reactive({
     req(input$selected_type)
     filter(movies, title_type %in% input$selected_type)
   })
-  
+
   # Create new df that is n_samp obs from selected type movies
-  movies_sample <- reactive({ 
+  movies_sample <- reactive({
     req(input$n_samp)
     sample_n(movies_subset(), input$n_samp)
   })
-  
+
   # Create scatterplot object the plotOutput function is expecting
   output$scatterplot <- renderPlot({
     ggplot(data = movies_sample(), aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point()
   })
-  
+
   # Print number of movies plotted
   output$n <- renderUI({
-    types <-  factor(movies_subset()$title_type, levels = input$selected_type) 
+    types <- factor(movies_subset()$title_type, levels = input$selected_type)
     counts <- table(types)
     HTML(paste("There are", counts, input$selected_type, "movies plotted in the plot above. <br>"))
   })
-  
 }
 
 # Create the Shiny app object --------------------------------------------------
@@ -916,7 +932,7 @@ In this section we discuss implementations of the three different types of react
 
 As we go through the different implementations, I recommend that you think back to where they appear on the reactive flow chart.
 
-```{r}
+```{r image-rective-flow}
 knitr::include_graphics("images/reactive-flow.png")
 ```
 
@@ -1117,54 +1133,68 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "critics_score"),
-      
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title Type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA Rating" = "mpaa_rating", 
-                              "Critics Rating" = "critics_rating", 
-                              "Audience Rating" = "audience_rating"),
-                  selected = "mpaa_rating"),
-      
-      sliderInput(inputId = "alpha", 
-                  label = "Alpha:", 
-                  min = 0, max = 1, 
-                  value = 0.5),
-      
-      sliderInput(inputId = "size", 
-                  label = "Size:", 
-                  min = 0, max = 5, 
-                  value = 2),
-      
-      textInput(inputId = "plot_title", 
-                label = "Plot title", 
-                placeholder = "Enter text to be used as plot title")
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
 
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
@@ -1174,13 +1204,11 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point(alpha = input$alpha, size = input$size) +
-      labs(title = toTitleCase(input$plot_title) )
+      labs(title = toTitleCase(input$plot_title))
   })
-  
 }
 
 # Create the Shiny app object --------------------------------------------------
@@ -1320,52 +1348,67 @@ load("movies.RData")
 
 ui <- fluidPage(
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating" = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics Score" = "critics_score", 
-                              "Audience Score" = "audience_score", 
-                              "Runtime" = "runtime"), 
-                  selected = "critics_score"),
-      
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title Type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA Rating" = "mpaa_rating", 
-                              "Critics Rating" = "critics_rating", 
-                              "Audience Rating" = "audience_rating"),
-                  selected = "mpaa_rating"),
-      
-      sliderInput(inputId = "alpha", 
-                  label = "Alpha:", 
-                  min = 0, max = 1, 
-                  value = 0.5),
-      
-      sliderInput(inputId = "size", 
-                  label = "Size:", 
-                  min = 0, max = 5, 
-                  value = 2),
-      
-      textInput(inputId = "plot_title", 
-                label = "Plot title", 
-                placeholder = "Enter text to be used as plot title")
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
 
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics Score" = "critics_score",
+          "Audience Score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title Type" = "title_type",
+          "Genre" = "genre",
+          "MPAA Rating" = "mpaa_rating",
+          "Critics Rating" = "critics_rating",
+          "Audience Rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      ),
+
+      sliderInput(
+        inputId = "size",
+        label = "Size:",
+        min = 0, max = 5,
+        value = 2
+      ),
+
+      textInput(
+        inputId = "plot_title",
+        label = "Plot title",
+        placeholder = "Enter text to be used as plot title"
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
@@ -1375,13 +1418,11 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point(alpha = input$alpha, size = input$size) +
-      labs(title = toTitleCase(input$plot_title) )
+      labs(title = toTitleCase(input$plot_title))
   })
-  
 }
 
 # Create the Shiny app object --------------------------------------------------
@@ -1531,20 +1572,20 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
     sidebarPanel(
-      
-      numericInput(inputId = "n_rows",
-                   label = "How many rows do you want to see?",
-                   value = 10),
-      
-      actionButton(inputId = "button", 
-                   label = "Show")
-      
+      numericInput(
+        inputId = "n_rows",
+        label = "How many rows do you want to see?",
+        value = 10
+      ),
+
+      actionButton(
+        inputId = "button",
+        label = "Show"
+      )
     ),
-    
+
     mainPanel(
       tableOutput(outputId = "datatable")
     )
@@ -1665,7 +1706,7 @@ We'll wrap up the chapter with a simple but important example.
 
 Here we have an app that adds 2 to the current value of x.
 
-```{r eval = FALSE, echo = TRUE}
+```{r add-2-1, eval = FALSE, echo = TRUE}
 library(shiny)
 
 ui <- fluidPage(
@@ -1703,7 +1744,7 @@ knitr::include_graphics("images/add-2.png")
 
 And here again is the code. What's wrong here? 
 
-```{r eval = FALSE, echo = TRUE}
+```{r add-2-2, eval = FALSE, echo = TRUE}
 library(shiny)
 
 ui <- fluidPage(
@@ -1737,7 +1778,7 @@ The object `current_x` is used in the render function, but it's not currently a 
 
 So we need to put the definition of `current_x` in the reactive function, like this:
 
-```{r eval = FALSE, echo = TRUE}
+```{r add-2-3, eval = FALSE, echo = TRUE}
 library(shiny)
 
 ui <- fluidPage(
@@ -1769,7 +1810,7 @@ But that's still not enough...
 
 We also need to refer to `current_x` with parantheses after its name. 
 
-```{r eval = FALSE, echo = TRUE}
+```{r add-2-4, eval = FALSE, echo = TRUE}
 library(shiny)
 
 ui <- fluidPage(
@@ -1813,7 +1854,7 @@ What's wrong with this? Fix it.
 
 :::
 
-```{r mult3, echo = TRUE, eval = FALSE}
+```{r 3-5-mult3, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
