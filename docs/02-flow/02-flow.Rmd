@@ -17,8 +17,7 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(shiny)
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 library(usethis)
 library(devtools)
 library(rsconnect)
@@ -36,7 +35,7 @@ knitr::opts_chunk$set(
 
 One familiar way of thinking about reactivity is to think in the context of a spreadsheet, like Google Sheets or Microsoft Excel.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/spreadsheet-1.png")
 ```
 
@@ -44,7 +43,7 @@ knitr::include_graphics("images/spreadsheet-1.png")
 
 Suppose you write a value into a cell in a spreadsheet...
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/spreadsheet-2.png")
 ```
 
@@ -52,7 +51,7 @@ knitr::include_graphics("images/spreadsheet-2.png")
 
 and then in another cell you write a formula that depends on that cell.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/spreadsheet-3.png")
 ```
 
@@ -60,7 +59,7 @@ knitr::include_graphics("images/spreadsheet-3.png")
 
 First, the formula is calculated with the value you originally typed.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/spreadsheet-4.png")
 ```
 
@@ -68,7 +67,7 @@ knitr::include_graphics("images/spreadsheet-4.png")
 
 Now when you change the value of the original cell, the result of the formula will automatically update, or in other words, react to this change.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/spreadsheet-5.png")
 ```
 
@@ -96,13 +95,13 @@ knitr::include_graphics("images/server-alpha.png")
 
 Here is a roadmap of the reactive flow in Shiny, though for now we'll just focus on the straight path between an input and an output, and discuss the other features later in the course.
 
-```{r out.width = "100%"}
+```{r, out.width = "100%"}
 knitr::include_graphics("images/reactive-flow.png")
 ```
 
 ### Reactive flow, simplified
 
-```{r out.width = "100%"}
+```{r, out.width = "100%"}
 knitr::include_graphics("images/reactive-flow-simple.png")
 ```
 
@@ -133,7 +132,7 @@ As we saw in the previous sections, reactivity is established by linking an inpu
 :::
 
 
-```{r, eval = FALSE, echo = TRUE}
+```{r ex-2-1a-build-reactive, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -190,7 +189,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r ex1-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-1a-build-reactive-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -203,27 +207,30 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "critics_score"),
-      
-      sliderInput(inputId = "alpha", 
-                  label = "Alpha:", 
-                  min = 0, max = 1, 
-                  value = 0.5)
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      ),
+
+      sliderInput(
+        inputId = "alpha",
+        label = "Alpha:",
+        min = 0, max = 1,
+        value = 0.5
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
@@ -233,7 +240,6 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point(alpha = input$alpha)
@@ -245,6 +251,8 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
+
 ### Dude, where's my plot?
 
 The server function of this app builds two plots, `scatterplot` and `densityplot`, however the app only displays one.
@@ -255,6 +263,7 @@ The server function of this app builds two plots, `scatterplot` and `densityplot
 - Make the necessary update to the app UI to display the missing plot
 - Reduce the height of the new plot using the `height` argument in the `plotOutput()` function (suggested height: `height = 200`)
 
+*Hint:* Make sure you place commas as appropriate.
 
 :::proj
 
@@ -265,7 +274,7 @@ The server function of this app builds two plots, `scatterplot` and `densityplot
 :::
 
 
-```{r, eval = FALSE, echo = TRUE}
+```{r ex-2-1b-where-plot, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -321,9 +330,13 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-*Hint:* Make sure you place commas as appropriate.
 
-```{r ex2-solution, include = FALSE, eval = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-1b-where-plot-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -336,20 +349,21 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-
   sidebarLayout(
-
     sidebarPanel(
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
 
-      selectInput(inputId = "y",
-                  label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "audience_score"),
-
-      selectInput(inputId = "x",
-                  label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
-                  selected = "critics_score")
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      )
     ),
 
     mainPanel(
@@ -362,7 +376,6 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
@@ -372,13 +385,14 @@ server <- function(input, output, session) {
     ggplot(data = movies, aes_string(x = input$x)) +
       geom_density()
   })
-
 }
 
 # Create the Shiny app object --------------------------------------------------
 
 shinyApp(ui = ui, server = server)
 ```
+
+</details>
 
 
 ## 2.2 UI Inputs
@@ -391,7 +405,7 @@ The goal of this section is to build familiarity with a few UI input functions.
 
 Once again, we'll build on our simple movie browser app.
 
-```{r out.width = "100%"}
+```{r, out.width = "100%"}
 knitr::include_graphics("images/app-selectinput-scatterplot.png")
 ```
 
@@ -401,7 +415,7 @@ Shiny provides a wide selection of input widgets. The Shiny cheatsheet is a grea
 
 Once you know which one you want to use, you can find out more about it in the package documentation. You'll also get a chance to work with some of them in the following exercises.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/cheatsheet-inputs.png")
 ```
 
@@ -436,7 +450,7 @@ checkboxInput(inputId = "show_data",
 
 A cautionary tale before we move on -- watch for your commas! Remember that this widget definition goes in the `sidebarPanel()`. In this panel we separate out widget with commas. 
 
-```{r commas, echo = TRUE, eval = FALSE}
+```{r snippet-commas, echo = TRUE, eval = FALSE}
 sidebarPanel(
     # Select variable for y-axis 
     selectInput(inputId = "y", label = "Y-axis:",
@@ -453,7 +467,7 @@ selected = "critics_score"),
  )
 ```
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/commas.png")
 ```
 
@@ -465,7 +479,7 @@ For example:
 
 ### 2. **ui**: Add an output to the UI defining where the data table should appear.
 
-```{r dt, eval = FALSE, echo = TRUE}
+```{r snippet-dt, eval = FALSE, echo = TRUE}
 mainPanel(
   # Show scatterplot
   plotOutput(outputId = "scatterplot"), 
@@ -499,13 +513,13 @@ Note that the first line of code in the function is an if statement, telling the
 
 Here is the resulting app, with the box **checked**:
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/app-datatable-checked.png")
 ```
 
 and box **unchecked**: 
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/app-datatable-checked.png")
 ```
 
@@ -551,7 +565,7 @@ The app below allows users to randomly select a desired number of movies, and di
 
 :::
 
-```{r eval = FALSE, echo = TRUE}
+```{r ex-2-2a-numericInput, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -605,7 +619,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r ex-2-2a-solution, include = FALSE, eval = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-2a-numericInput-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -621,21 +640,19 @@ n_total <- nrow(movies)
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
     sidebarPanel(
-      
       HTML(paste("Enter a value between 1 and", n_total)),
-      
-      numericInput(inputId = "n",
-                   label = "Sample size:",
-                   value = 30,
-                   min = 1, max = n_total,
-                   step = 1)
-      
+
+      numericInput(
+        inputId = "n",
+        label = "Sample size:",
+        value = 30,
+        min = 1, max = n_total,
+        step = 1
+      )
     ),
-    
+
     mainPanel(
       dataTableOutput(outputId = "moviestable")
     )
@@ -645,16 +662,16 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$moviestable <- renderDataTable({
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
-    DT::datatable(data = movies_sample, 
-                  options = list(pageLength = 10), 
-                  rownames = FALSE)
+    DT::datatable(
+      data = movies_sample,
+      options = list(pageLength = 10),
+      rownames = FALSE
+    )
   })
-  
 }
 
 # Create a Shiny app object ----------------------------------------------------
@@ -662,6 +679,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### req
 
@@ -690,7 +708,7 @@ The `req()` function is the simplest and best way to do this, it ensures that va
 
 :::
 
-```{r, eval = FALSE, echo = TRUE}
+```{r ex-2-2b-req, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -746,8 +764,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r, ex-2-2b-solution, echo = FALSE, eval = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-2b-req-solution, echo = FALSE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -762,21 +784,19 @@ n_total <- nrow(movies)
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
     sidebarPanel(
-      
       HTML(paste("Enter a value between 1 and", n_total)),
-      
-      numericInput(inputId = "n",
-                   label = "Sample size:",
-                   value = 30,
-                   min = 1, max = n_total,
-                   step = 1)
-      
+
+      numericInput(
+        inputId = "n",
+        label = "Sample size:",
+        value = 30,
+        min = 1, max = n_total,
+        step = 1
+      )
     ),
-    
+
     mainPanel(
       dataTableOutput(outputId = "moviestable")
     )
@@ -786,17 +806,17 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$moviestable <- renderDataTable({
     req(input$n)
     movies_sample <- movies %>%
       sample_n(input$n) %>%
       select(title:studio)
-    datatable(data = movies_sample, 
-              options = list(pageLength = 10), 
-              rownames = FALSE)
+    datatable(
+      data = movies_sample,
+      options = list(pageLength = 10),
+      rownames = FALSE
+    )
   })
-  
 }
 
 # Create a Shiny app object ----------------------------------------------------
@@ -804,6 +824,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Select to selectize
 
@@ -830,7 +851,7 @@ The app below can be used to display movies from selected studios. Currently you
 
 :::
 
-```{r eval = FALSE, echo = TRUE}
+```{r ex-2-2c-selectize, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -881,8 +902,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r, ex-2-2c-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-2c-selectize-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -898,17 +923,19 @@ all_studios <- sort(unique(movies$studio))
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-    sidebarLayout(
-    
+  sidebarLayout(
+
     # Input(s)
     sidebarPanel(
-      selectInput(inputId = "studio",
-                  label = "Select studio:",
-                  choices = all_studios,
-                  selected = "20th Century Fox",
-                  multiple = TRUE)
+      selectInput(
+        inputId = "studio",
+        label = "Select studio:",
+        choices = all_studios,
+        selected = "20th Century Fox",
+        multiple = TRUE
+      )
     ),
-    
+
     # Output(s)
     mainPanel(
       dataTableOutput(outputId = "moviestable")
@@ -918,18 +945,19 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output, session) {
-  
+
   # Create data table
   output$moviestable <- renderDataTable({
     req(input$studio)
     movies_from_selected_studios <- movies %>%
       filter(studio %in% input$studio) %>%
       select(title:studio)
-    DT::datatable(data = movies_from_selected_studios, 
-                  options = list(pageLength = 10), 
-                  rownames = FALSE)
+    DT::datatable(
+      data = movies_from_selected_studios,
+      options = list(pageLength = 10),
+      rownames = FALSE
+    )
   })
-  
 }
 
 # Create a Shiny app object ----------------------------------------------------
@@ -937,6 +965,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Convert `dateInput` to `dateRangeInput`
 
@@ -964,7 +993,7 @@ The app below can be used to display movies from a particular date onwards. Inst
 
 :::
 
-```{r, eval = FALSE, echo = TRUE}
+```{r ex-2-2d-dates, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1019,7 +1048,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r ex-2-2d-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-2d-dates-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1035,22 +1069,22 @@ max_date <- max(movies$thtr_rel_date)
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-    sidebarLayout(
-    
+  sidebarLayout(
     sidebarPanel(
-      
       HTML(paste0("Movies released between the following dates will be plotted. 
                   Pick dates between ", min_date, " and ", max_date, ".")),
-      
+
       br(), br(),
-      
-      dateRangeInput(inputId = "date",
-                label = "Select dates:",
-                start = "2013-01-01", end = "2014-01-01",
-                min = min_date, max = max_date,
-                startview = "year")
+
+      dateRangeInput(
+        inputId = "date",
+        label = "Select dates:",
+        start = "2013-01-01", end = "2014-01-01",
+        min = min_date, max = max_date,
+        startview = "year"
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
@@ -1060,7 +1094,6 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     req(input$date)
     movies_selected_date <- movies %>%
@@ -1068,7 +1101,6 @@ server <- function(input, output, session) {
     ggplot(data = movies_selected_date, aes(x = critics_score, y = audience_score, color = mpaa_rating)) +
       geom_point()
   })
-  
 }
 
 # Create a Shiny app object ----------------------------------------------------
@@ -1076,6 +1108,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ## 2.3 `render*()` functions
 
@@ -1119,7 +1152,7 @@ knitr::include_graphics("images/app-summary-table.png")
 
 So we want to add a summary table beneath the plot displaying summary statistics for a new variable we'll create: `score_ratio`, the ratio of audience scores to critics scores.
 
-```{r eval = FALSE}
+```{r, eval = FALSE}
 score_ratio = audience_score / critics_score
 ```
 
@@ -1161,7 +1194,7 @@ checkboxGroupInput(inputId = "selected_title_type",
 
 ### 3. **ui**: Add an output defining where the summary tables should appear. 
 
-```{r where-summary, eval = FALSE, echo = TRUE}
+```{r snippet-where-summary, eval = FALSE, echo = TRUE}
 mainPanel(
   # Show scatterplot
   plotOutput(outputId = "scatterplot"), 
@@ -1176,13 +1209,13 @@ We use the `tableOutput()` function for this. This function takes one argument, 
 
 Lastly, in the server, we describe how this table should be calculated with the `renderTable()` function. 
 
-```{r summary_table, eval = FALSE, echo = TRUE}
+```{r snippet-summary-table-output, eval = FALSE, echo = TRUE}
 output$summarytable <- renderTable(
   {
     movies %>%
       filter(title_type %in% input$selected_title_type) %>%
       group_by(mpaa_rating) %>%
-      summarise(Mean = mean(score_ratio), SD = sd(score_ratio), n = n())
+      summarise(mean_score_ratio = mean(score_ratio), SD = sd(score_ratio), n = n())
   },
   striped = TRUE,
   spacing = "l",
@@ -1197,12 +1230,12 @@ Note that the name of the output created by the render function should match the
 
 The first argument is the expression that returns an R object in tabular form.
 
-```{r eval = FALSE, echo = TRUE}
+```{r snippet-summary-make, eval = FALSE, echo = TRUE}
   {
     movies %>%
       filter(title_type %in% input$selected_title_type) %>%
       group_by(mpaa_rating) %>%
-      summarise(Mean = mean(score_ratio), SD = sd(score_ratio), n = n())
+      summarise(mean_score_ratio = mean(score_ratio), SD = sd(score_ratio), n = n())
   }
 ```
 
@@ -1214,13 +1247,13 @@ Then, the expression groups the data by MPAA rating, and then calculates summary
 
 If we stopped here and didn't include any of the following arguments, the app would look something like this:
 
-```{r out.width = "40%"}
+```{r, out.width = "40%"}
 knitr::include_graphics("images/summary-table.png")
 ```
 
 But we want our table to look like this: 
 
-```{r out.width = "70%"}
+```{r, out.width = "70%"}
 knitr::include_graphics("images/summary-table-styled.png")
 ```
 
@@ -1228,7 +1261,7 @@ knitr::include_graphics("images/summary-table-styled.png")
 
 In order to achieve this look, we add additional arguments to our `render*` function. 
 
-```{r eval = FALSE, echo = TRUE}
+```{r snippet-options, eval = FALSE, echo = TRUE}
 striped = TRUE, spacing = "l", align = "lccr", digits = 4, width = "90%",
 caption = "Score ratio (audience / critics' scores) summary statistics by MPAA rating."
 ```
@@ -1269,7 +1302,7 @@ The following app is one you've seen before -- it creates a scatterplot of two v
 
 :::
 
-```{r missing, echo = TRUE, eval = FALSE}
+```{r ex-2-3a-missing, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1318,8 +1351,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r missing-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-3a-missing-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1334,20 +1371,22 @@ load("movies.RData")
 
 ui <- fluidPage(
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "critics_score")
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot")
     )
@@ -1357,18 +1396,18 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
-  
 }
 
 # Create a Shiny app object ----------------------------------------------------
 
 shinyApp(ui = ui, server = server)
 ```
+
+</details>
 
 ### Add `renderText()`
 
@@ -1387,7 +1426,7 @@ In this app, the user selects `x` and `y` variables for the scatterplot. We will
 
 :::
 
-```{r render-text, eval = FALSE, echo = TRUE}
+```{r ex-2-3b-render-text, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1443,8 +1482,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r render-text-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-3b-render-text-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1459,20 +1502,22 @@ load("movies.RData")
 
 ui <- fluidPage(
   sidebarLayout(
-    
     sidebarPanel(
-      
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "audience_score"),
-      
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
-                  selected = "critics_score")
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "audience_score"
+      ),
+
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"),
+        selected = "critics_score"
+      )
     ),
-    
+
     mainPanel(
       plotOutput(outputId = "scatterplot"),
       textOutput(outputId = "correlation")
@@ -1483,17 +1528,18 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
   })
-  
-  # Create text output stating the correlation between the two ploted 
+
+  # Create text output stating the correlation between the two ploted
   output$correlation <- renderText({
     r <- round(cor(movies[, input$x], movies[, input$y], use = "pairwise"), 3)
-    paste0("Correlation = ", r,
-          ". Note: If the relationship between the two variables is not linear, the correlation coefficient will not be meaningful.")
+    paste0(
+      "Correlation = ", r,
+      ". Note: If the relationship between the two variables is not linear, the correlation coefficient will not be meaningful."
+    )
   })
 }
 
@@ -1502,6 +1548,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ## 2.4: UI outputs
 
@@ -1595,7 +1642,7 @@ In addition to brushing, users can also interact with plots via hovering over th
 
 :::
 
-```{r hovering, eval = FALSE, echo = TRUE}
+```{r ex-2-4a-hovering, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1654,7 +1701,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r hover-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-4a-hovering-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1711,6 +1763,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Displaying text outputs
 
@@ -1730,7 +1783,7 @@ The goal in this exercise is to develop an app where the user selects two variab
 :::
 
 
-```{r text-outputs, eval = FALSE, echo = TRUE}
+```{r ex-2-4b-text-outputs, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1802,7 +1855,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r text-outputs-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-4b-text-outputs-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1874,6 +1932,8 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
+
 ### Creating and formatting HTML output
 
 In the previous exercise you developed an app that reported averages of selected x and y variables as two separate outputs. An alternative approach would be to combine them into a single, multi-line output.
@@ -1893,7 +1953,7 @@ Combine the values calculated in the previous exercise as described below to cre
 
 :::
 
-```{r html, echo = TRUE, eval = FALSE}
+```{r ex-2-4c-html, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1964,8 +2024,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
 
-```{r html-solution, include = FALSE}
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-4c-html-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -2033,6 +2097,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
+</details>
 
 ### Download data with `downloadButton()`
 
@@ -2053,7 +2118,7 @@ Download the selected data with `downloadButton()` using instructions help files
 
 :::
 
-```{r download, eval = FALSE, echo = TRUE}
+```{r ex-2-4d-download, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -2116,7 +2181,12 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 ```
 
-```{r download-solution, include = FALSE}
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-2-4d-download-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -2178,3 +2248,5 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 ```
+
+</details>

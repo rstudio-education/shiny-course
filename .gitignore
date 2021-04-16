@@ -11,3 +11,7 @@ rsconnect/
 02-flow/02-flow.html
 03-reactivity/03-reactivity.html
 04-ui/04-ui.html
+docs/01-hello/**
+docs/02-flow/**
+docs/03-reactivity/**
+docs/04-ui/**

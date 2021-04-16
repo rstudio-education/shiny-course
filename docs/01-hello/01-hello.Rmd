@@ -17,7 +17,7 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(shiny)
-library(ggplot2)
+library(tidyverse)
 library(usethis)
 library(devtools)
 library(rsconnect)
@@ -44,7 +44,7 @@ So, let's get to it...
 
 And not just any app, an app that you will be able to build by the end of this tutorial!
 
-```{r context = "data", cache = TRUE}
+```{r, context = "data", cache = TRUE}
 load("movies.RData")
 ```
 
@@ -91,7 +91,7 @@ The tutorial is designed for beginners and many of the exercises have plenty of 
 
 That being said, there are a few other resources that might help your learning.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/help.png")
 ```
 
@@ -109,7 +109,7 @@ Also, let's go over three very important tips for learning to develop Shiny apps
 
 1. **Watch out for commas!** This will mean more as you start to learn Shiny, but just keep in mind, a Shiny error can often be caused by a missing comma. Thankfully, the RStudio IDE will alert you to most of these missing comma or similar syntax errors, like the one shown below.
 
-```{r out.width = "30%"}
+```{r, out.width = "30%"}
 knitr::include_graphics("images/missing-comma-ide.png")
 ```
 
@@ -117,7 +117,7 @@ knitr::include_graphics("images/missing-comma-ide.png")
 
 Alrighty, let's take a look at the anatomy of a Shiny app:
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/anatomy.png")
 ```
 
@@ -141,7 +141,7 @@ So where does the loading of the data happen in an app?
 
 Let's revisit the app layout from a couple sections back.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/revisit.png")
 ```
 
@@ -153,11 +153,12 @@ Alright, time for some practice!
 
 ### What's in an app?
 
-```{r q1-1}
+```{r mc-1}
 question("Which is not generally a part of the Shiny app architecture?",
-  answer("A function that installs an R package", 
-         correct = TRUE, 
-         message = "You don't want to reinstall the package every time you run your app, so you should do this once in your console instead of within your Shiny app."),
+  answer("A function that installs an R package",
+    correct = TRUE,
+    message = "You don't want to reinstall the package every time you run your app, so you should do this once in your console instead of within your Shiny app."
+  ),
   answer("User interface"),
   answer("Server function"),
   answer("A function that creates Shiny app objects"),
@@ -187,7 +188,7 @@ I've created an RStudio Cloud Project for you to test drive this code. Click the
 - Play with the input sliders and observe how the output changes.
 - Change the `selected` choice for the `y` input to `imdb_rating` and for the `x` input to `imdb_num_votes` and rerun the app.
 
-```{r ex-1-1, eval = FALSE, echo = TRUE}
+```{r ex-1-1-slider, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -231,7 +232,7 @@ ui <- fluidPage(
 
 # Define server ----------------------------------------------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
       geom_point()
@@ -247,7 +248,7 @@ shinyApp(ui = ui, server = server)
 
 ### 
 
-In this section we’ll build the user interface of a simple app.
+In this section we'll build the user interface of a simple app.
 
 However, before we get into the weeds of building a user interface, let's revisit the anatomy of a Shiny app.
 
@@ -387,7 +388,7 @@ Note that `choices` takes a named vector, and the name rather than the value (wh
 
 :::
 
-```{r ex-1-2a, eval = FALSE, echo = TRUE}
+```{r ex-1-2a-selectInput, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -435,7 +436,7 @@ ui <- fluidPage(
 
 # Define server ----------------------------------------------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y,
@@ -450,6 +451,75 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-1-2a-selectInput-solution, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(
+  
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("imdb_rating", "imdb_num_votes", "critics_score", "audience_score", "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("title_type", "genre", "mpaa_rating", "critics_rating", "audience_rating"),
+                  selected = "mpaa_rating")
+      
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {
+  
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+  
+  }
+
+# Create a Shiny app object ----------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+</details>
 
 ### Extend the UI further
 
@@ -468,7 +538,7 @@ The potential variables the user can select for the `x` and `y` axes and `color`
 
 :::
 
-```{r ex1-2b, eval = FALSE, echo = TRUE}
+```{r ex-1-2b-selectInput-labels, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -521,7 +591,7 @@ ui <- fluidPage(
 
 # Define server ----------------------------------------------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   output$scatterplot <- renderPlot({
     ggplot(data = movies, aes_string(x = input$x, y = input$y,
@@ -535,6 +605,89 @@ server <- function(input, output) {
 
 shinyApp(ui = ui, server = server)
 ```
+
+<details>
+<summary>Show solution</summary>
+
+See the following code chunk for the solution to the exercise above. 
+
+```{r ex-1-2b-selectInput-labels-solution, eval = FALSE, echo = TRUE}
+# Load packages ----------------------------------------------------------------
+
+library(shiny)
+library(ggplot2)
+
+# Load data --------------------------------------------------------------------
+
+load("movies.RData")
+
+# Define UI --------------------------------------------------------------------
+
+ui <- fluidPage(
+  
+  sidebarLayout(
+    
+    # Inputs: Select variables to plot
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "audience_score"),
+      
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("IMDB rating"          = "imdb_rating", 
+                              "IMDB number of votes" = "imdb_num_votes", 
+                              "Critics score"        = "critics_score", 
+                              "Audience score"       = "audience_score", 
+                              "Runtime"              = "runtime"), 
+                  selected = "critics_score"),
+      
+      # Select variable for color
+      # Select variable for color
+      selectInput(inputId = "z", 
+                  label = "Color by:",
+                  choices = c("Title type" = "title_type", 
+                              "Genre" = "genre", 
+                              "MPAA rating" = "mpaa_rating", 
+                              "Critics rating" = "critics_rating", 
+                              "Audience rating" = "audience_rating"),
+                  selected = "mpaa_rating")
+      
+    ),
+    
+    # Output: Show scatterplot
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server ----------------------------------------------------------------
+
+server <- function(input, output, session) {
+  
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y,
+                                     color = input$z)) +
+      geom_point()
+  })
+  
+  }
+
+# Create a Shiny app object ----------------------------------------------------
+
+shinyApp(ui = ui, server = server)
+```
+
+</details>
 
 ## 1.3 Server function
 
@@ -615,7 +768,7 @@ There are three rules of building server functions:
 
 Just like various inputs, Shiny also provides a wide selection of output types each of which works with a render function.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/cheatsheet-outputs.png")
 ```
 
@@ -633,7 +786,7 @@ In the following exercises you'll get a chance to work with other render/output 
 
 Let's also briefly discuss reactivity. 
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/reactivity.png")
 ```
 
@@ -645,7 +798,7 @@ In a nutshell Shiny automatically updates outputs, such as plots, when inputs th
 
 Before we wrap up this section, I should also mention the last component of each Shiny app, which is a call to the aptly named `shinyApp()` function, which puts the UI and the server pieces together to create a Shiny app object.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/shinyAppfunction.png")
 ```
 
@@ -658,11 +811,12 @@ Time to put this all into practice!
 
 Which of the following is not true about server functions?
 
-```{r ex3-1}
+```{r mc-2}
 question("Which of the following is not true about server functions?",
-  answer("Server functions should include a call to `runApp()`", 
-         correct = TRUE,
-         message = "The `runApp()` function can be used in the Console to run a Shiny application, as an alternative to the Run App button in the RStudio IDE."),
+  answer("Server functions should include a call to `runApp()`",
+    correct = TRUE,
+    message = "The `runApp()` function can be used in the Console to run a Shiny application, as an alternative to the Run App button in the RStudio IDE."
+  ),
   answer("Objects to be displayed should be saved to `output$`"),
   answer("Reactive objects should be built with `render*()` functions"),
   answer("Input values should be referred to with `input$`"),
@@ -670,7 +824,6 @@ question("Which of the following is not true about server functions?",
   random_answer_order = TRUE
 )
 ```
-
 
 ### Fix it up
 
@@ -689,7 +842,7 @@ Below is the code for the Shiny app we built earlier, however currently the code
 
 :::
 
-```{r ex-1-3, eval = FALSE, echo = TRUE}
+```{r ex-1-3-fixup, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -702,43 +855,54 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
+
     # Inputs: Select variables to plot
     sidebarPanel(
-      
+
       # Select variable for y-axis
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
-                  selected = "audience_score"),
-      
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics score" = "critics_score",
+          "Audience score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
       # Select variable for x-axis
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
-                  selected = "critics_score"),
-      
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics score" = "critics_score",
+          "Audience score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
       # Select variable for color
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA rating" = "mpaa_rating", 
-                              "Critics rating" = "critics_rating", 
-                              "Audience rating" = "audience_rating"),
-                  selected = "mpaa_rating")
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title type" = "title_type",
+          "Genre" = "genre",
+          "MPAA rating" = "mpaa_rating",
+          "Critics rating" = "critics_rating",
+          "Audience rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      )
     ),
-    
+
     # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterPlot")
@@ -749,22 +913,21 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderTable({
-    ggplot(data = movies, aes_string(x = x, y = y,
-                                     color = z)) +
+    ggplot(data = movies, aes_string(
+      x = x, y = y,
+      color = z
+    )) +
       geom_point()
   })
-  
-  }
+}
 
 # Create a Shiny app object ----------------------------------------------------
 
 shinyApp(ui = ui, server = server)
 ```
 
-
-```{r solution-1-3, include = FALSE}
+```{r ex-1-3-fixup-solution, include = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -777,43 +940,54 @@ load("movies.RData")
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
-  
   sidebarLayout(
-    
+
     # Inputs: Select variables to plot
     sidebarPanel(
-      
+
       # Select variable for y-axis
-      selectInput(inputId = "y", 
-                  label = "Y-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
-                  selected = "audience_score"),
-      
+      selectInput(
+        inputId = "y",
+        label = "Y-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics score" = "critics_score",
+          "Audience score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "audience_score"
+      ),
+
       # Select variable for x-axis
-      selectInput(inputId = "x", 
-                  label = "X-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
-                  selected = "critics_score"),
-      
+      selectInput(
+        inputId = "x",
+        label = "X-axis:",
+        choices = c(
+          "IMDB rating" = "imdb_rating",
+          "IMDB number of votes" = "imdb_num_votes",
+          "Critics score" = "critics_score",
+          "Audience score" = "audience_score",
+          "Runtime" = "runtime"
+        ),
+        selected = "critics_score"
+      ),
+
       # Select variable for color
-      selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA rating" = "mpaa_rating", 
-                              "Critics rating" = "critics_rating", 
-                              "Audience rating" = "audience_rating"),
-                  selected = "mpaa_rating")
+      selectInput(
+        inputId = "z",
+        label = "Color by:",
+        choices = c(
+          "Title type" = "title_type",
+          "Genre" = "genre",
+          "MPAA rating" = "mpaa_rating",
+          "Critics rating" = "critics_rating",
+          "Audience rating" = "audience_rating"
+        ),
+        selected = "mpaa_rating"
+      )
     ),
-    
+
     # Output: Show scatterplot
     mainPanel(
       plotOutput(outputId = "scatterplot")
@@ -824,14 +998,14 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
   output$scatterplot <- renderPlot({
-    ggplot(data = movies, aes_string(x = input$x, y = input$y,
-                                     color = input$z)) +
+    ggplot(data = movies, aes_string(
+      x = input$x, y = input$y,
+      color = input$z
+    )) +
       geom_point()
   })
-  
-  }
+}
 
 # Create a Shiny app object ----------------------------------------------------
 
@@ -847,7 +1021,7 @@ Let's quickly recap what we have learned in this chapter.
 
 Every Shiny app has a webpage that the user visits, and behind this webpage there is a computer that serves this webpage by running R.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-1.png")
 ```
 
@@ -855,7 +1029,7 @@ knitr::include_graphics("images/recap-1.png")
 
 When running your app locally, the computer serving your app is your computer.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-2.png")
 ```
 
@@ -863,7 +1037,7 @@ knitr::include_graphics("images/recap-2.png")
 
 When your app is deployed, the computer serving your app is a web server.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-3.png")
 ```
 
@@ -871,7 +1045,7 @@ knitr::include_graphics("images/recap-3.png")
 
 Each app is comprised of two components, a UI and a server. 
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-4.png")
 ```
 
@@ -887,7 +1061,7 @@ In this tutorial you will be developing your apps in RStudio Cloud projects, but
 
 RStudio will automatically recognize R scripts that contain `ui` and `server` components and that end with a call to the `shinyApp()` function and will make available the Run App button. You can choose to run your app in a new window, or in the viewer pane of your RStudio window.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-5.png")
 ```
 
@@ -895,7 +1069,7 @@ knitr::include_graphics("images/recap-5.png")
 
 When you are done with an app, you can terminate the session by clicking the red stop button in your viewer pane.
 
-```{r out.width = "80%"}
+```{r, out.width = "80%"}
 knitr::include_graphics("images/recap-6.png")
 ```
 

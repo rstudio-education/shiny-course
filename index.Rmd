@@ -77,10 +77,12 @@ If you don't want to work in RStudio Cloud projects, you can instead choose to r
 
 2. Copy and paste the code for the each exercise, which you'll find at the end of each exercise question. 
 
-```{r fig.cap = "Copy to clipboard"}
-knitr::include_graphics("images/copyclipboard.png")
-```
-
 ### Ready, steady, go!
 
 Time to give this Shiny course a whirl!
+
+### Questions?
+
+[RStudio Community](https://community.rstudio.com/c/shiny/8) is a great place to ask any questions related to Shiny. 
+
+If you have any suggestions for improvement (bug reports, typos, something unclear that should be revised, etc.) for this particular tutorial, you can open an issue in the [tutorial repo](https://rstudio-education.github.io/shiny-course/).
