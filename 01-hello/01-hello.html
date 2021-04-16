@@ -293,17 +293,17 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   border-radius: 6px 0 6px 6px;
 }
 </style>
-  
-  
+
+
 <div class="container-fluid main-container">
   <div class="row-fluid">
     <div class="col-xs-12 col-sm-4 col-md-3">
       <div id="TOC" class="tocify">
       </div>
     </div>
-  
+
     <div class="toc-content col-xs-12 col-sm-8 col-md-9">
-  
+
     <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -324,16 +324,16 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="01-hello/01-hello.html">Module 1</a>
+              <a href="https://minecr.shinyapps.io/01-hello/">Module 1</a>
             </li>
             <li>
-              <a href="02-flow/02-flow.html">Module 2</a>
+              <a href="https://minecr.shinyapps.io/02-flow/">Module 2</a>
             </li>
             <li>
-              <a href="03-reactivity/03-reactivity.html">Module 3</a>
+              <a href="https://minecr.shinyapps.io/03-reactivity/">Module 3</a>
             </li>
             <li>
-              <a href="04-ui/04-ui.html">Module 4</a>
+              <a href="https://minecr.shinyapps.io/04-ui/">Module 4</a>
             </li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -341,7 +341,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
     </div><!--/.navbar -->
   </div>
 </div>
-  
+
 
 <div class="pageContent band">
 <div class="bandContent page">
@@ -969,98 +969,98 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="section-section-10" class="section level3">
 <h3></h3>
-That’s all for this module! In the next module we discuss inputs, outputs, and rendering functions in further detail. 
+That’s all for this module! In the next module we discuss inputs, outputs, and rendering functions in further detail.
 <script type="application/shiny-prerendered" data-context="server-start">
 library(learnr)
 library(shiny)
 library(ggplot2)
 knitr::opts_chunk$set(
-  echo = FALSE, 
+  echo = FALSE,
   fig.align = "center",
   out.width = "100%"
   )
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::register_http_handlers(session, metadata = NULL)
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::clear_exercise_cache_env()
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
 session$onSessionEnded(function() {
         learnr:::event_trigger(session, "session_stop")
       })
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(shiny)", "library(ggplot2)", "knitr::opts_chunk$set(", 
-"  echo = FALSE, ", "  fig.align = \"center\",", "  out.width = \"100%\"", 
+learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(shiny)", "library(ggplot2)", "knitr::opts_chunk$set(",
+"  echo = FALSE, ", "  fig.align = \"center\",", "  out.width = \"100%\"",
 "  )"), overwrite = FALSE)
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "q1-1", question = structure("Which is not generally a part of the Shiny app architecture?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_b1f97c4", 
-    option = "A function that installs an R package", value = "A function that installs an R package", 
-    label = structure("A function that installs an R package", html = TRUE, class = c("html", 
-    "character")), correct = TRUE, message = structure("You don&#39;t want to reinstall the package every time you run your app, so you should do this once in your console instead of within your Shiny app.", html = TRUE, class = c("html", 
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "q1-1", question = structure("Which is not generally a part of the Shiny app architecture?", html = TRUE, class = c("html",
+"character")), answers = list(structure(list(id = "lnr_ans_b1f97c4",
+    option = "A function that installs an R package", value = "A function that installs an R package",
+    label = structure("A function that installs an R package", html = TRUE, class = c("html",
+    "character")), correct = TRUE, message = structure("You don&#39;t want to reinstall the package every time you run your app, so you should do this once in your console instead of within your Shiny app.", html = TRUE, class = c("html",
     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer"
-)), structure(list(id = "lnr_ans_824ec29", option = "User interface", 
-    value = "User interface", label = structure("User interface", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a37a763", 
-    option = "Server function", value = "Server function", label = structure("Server function", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_2835c66", 
-    option = "A function that creates Shiny app objects", value = "A function that creates Shiny app objects", 
-    label = structure("A function that creates Shiny app objects", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
-"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
-"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
-"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
-"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+)), structure(list(id = "lnr_ans_824ec29", option = "User interface",
+    value = "User interface", label = structure("User interface", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a37a763",
+    option = "Server function", value = "Server function", label = structure("Server function", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_2835c66",
+    option = "A function that creates Shiny app objects", value = "A function that creates Shiny app objects",
+    label = structure("A function that creates Shiny app objects", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html",
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html",
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html",
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html",
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html",
 "character")), message = NULL, post_message = NULL), ids = list(
-    answer = "q1-1-answer", question = "q1-1"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich is not generally a part of the Shiny app architecture?\n<br/><br/><br/>", html = TRUE, class = c("html", 
-"character")), random_answer_order = TRUE, allow_retry = FALSE, 
-    seed = 1744354564.18772, options = list()), class = c("learnr_radio", 
+    answer = "q1-1-answer", question = "q1-1"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich is not generally a part of the Shiny app architecture?\n<br/><br/><br/>", html = TRUE, class = c("html",
+"character")), random_answer_order = TRUE, allow_retry = FALSE,
+    seed = 1744354564.18772, options = list()), class = c("learnr_radio",
 "tutorial_question")))
 </script>
- 
+
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "ex3-1", question = structure("Which of the following is not true about server functions?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_6bc8f16", 
-    option = "Server functions should include a call to `runApp()`", 
-    value = "Server functions should include a call to `runApp()`", 
-    label = structure("Server functions should include a call to <code>runApp()<\u002fcode>", html = TRUE, class = c("html", 
-    "character")), correct = TRUE, message = structure("The <code>runApp()<\u002fcode> function can be used in the Console to run a Shiny application, as an alternative to the Run App button in the RStudio IDE.", html = TRUE, class = c("html", 
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "ex3-1", question = structure("Which of the following is not true about server functions?", html = TRUE, class = c("html",
+"character")), answers = list(structure(list(id = "lnr_ans_6bc8f16",
+    option = "Server functions should include a call to `runApp()`",
+    value = "Server functions should include a call to `runApp()`",
+    label = structure("Server functions should include a call to <code>runApp()<\u002fcode>", html = TRUE, class = c("html",
+    "character")), correct = TRUE, message = structure("The <code>runApp()<\u002fcode> function can be used in the Console to run a Shiny application, as an alternative to the Run App button in the RStudio IDE.", html = TRUE, class = c("html",
     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer"
-)), structure(list(id = "lnr_ans_6c29898", option = "Objects to be displayed should be saved to `output$`", 
-    value = "Objects to be displayed should be saved to `output$`", 
-    label = structure("Objects to be displayed should be saved to <code>output$<\u002fcode>", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6c651e0", 
-    option = "Reactive objects should be built with `render*()` functions", 
-    value = "Reactive objects should be built with `render*()` functions", 
-    label = structure("Reactive objects should be built with <code>render*()<\u002fcode> functions", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a5cf2d4", 
-    option = "Input values should be referred to with `input$`", 
-    value = "Input values should be referred to with `input$`", 
-    label = structure("Input values should be referred to with <code>input$<\u002fcode>", html = TRUE, class = c("html", 
-    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
-"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
-"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
-"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
-"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+)), structure(list(id = "lnr_ans_6c29898", option = "Objects to be displayed should be saved to `output$`",
+    value = "Objects to be displayed should be saved to `output$`",
+    label = structure("Objects to be displayed should be saved to <code>output$<\u002fcode>", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6c651e0",
+    option = "Reactive objects should be built with `render*()` functions",
+    value = "Reactive objects should be built with `render*()` functions",
+    label = structure("Reactive objects should be built with <code>render*()<\u002fcode> functions", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a5cf2d4",
+    option = "Input values should be referred to with `input$`",
+    value = "Input values should be referred to with `input$`",
+    label = structure("Input values should be referred to with <code>input$<\u002fcode>", html = TRUE, class = c("html",
+    "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer",
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html",
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html",
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html",
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html",
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html",
 "character")), message = NULL, post_message = NULL), ids = list(
-    answer = "ex3-1-answer", question = "ex3-1"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of the following is not true about server functions?\n<br/><br/><br/>", html = TRUE, class = c("html", 
-"character")), random_answer_order = TRUE, allow_retry = FALSE, 
-    seed = 2002521256.0675, options = list()), class = c("learnr_radio", 
+    answer = "ex3-1-answer", question = "ex3-1"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of the following is not true about server functions?\n<br/><br/><br/>", html = TRUE, class = c("html",
+"character")), random_answer_order = TRUE, allow_retry = FALSE,
+    seed = 2002521256.0675, options = list()), class = c("learnr_radio",
 "tutorial_question")))
 </script>
  <!--html_preserve-->

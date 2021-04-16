@@ -7,15 +7,15 @@ navbar:
       href: index.html
   right:
     - text: "Module 1"
-      href: 01-hello/01-hello.html
+      href: https://minecr.shinyapps.io/01-hello/
     - text: "Module 2"
-      href: 02-flow/02-flow.html.html
+      href: https://minecr.shinyapps.io/02-flow/
     - text: "Module 3"
-      href: 03-reactivity/03-reactivity.html
+      href: https://minecr.shinyapps.io/03-reactivity/
     - text: "Module 4"
-      href: 04-ui/04-ui.html
-output: 
-  html_document: 
+      href: https://minecr.shinyapps.io/04-ui/
+output:
+  html_document:
     theme: paper
     inverse: true
     css: site.css
