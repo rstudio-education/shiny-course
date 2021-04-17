@@ -1,6 +1,6 @@
 ---
-title: "2: Inputs, outputs, and rendering functions"
-subtitle: "Relating inputs to rendering functions to outputs & build on one app over the chapter"
+title: "2: Reactive flow"
+subtitle: "Relating inputs to rendering functions to outputs"
 output: 
   learnr::tutorial:
     progressive: true

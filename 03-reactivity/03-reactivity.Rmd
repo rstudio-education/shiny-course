@@ -1,6 +1,6 @@
 ---
-title: "3: Reactive programming"
-subtitle:
+title: "3: Reactivity essentials"
+subtitle: "Diving deeper into reactive programming"
 output: 
   learnr::tutorial:
     progressive: true

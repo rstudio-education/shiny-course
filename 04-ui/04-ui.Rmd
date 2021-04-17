@@ -1,6 +1,6 @@
 ---
-title: "4: Customizing appearance"
-subtitle:
+title: "4: Customizing UI"
+subtitle: "Understanding how to build a user interface"
 output: 
   learnr::tutorial:
     progressive: true
