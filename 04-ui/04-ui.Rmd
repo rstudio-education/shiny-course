@@ -292,13 +292,15 @@ HTML("Hello world, <br/> and then a line break.")
 Hello world, <br/> and then a line break.
 ```
 
-## 4.1 Practice
+### Practice
 
 Next, let's work on some exercises on adding HTML elements to our apps to customize appearance.
 
 These next exercises will demo a few of the simpler interface builder options with HTML code.
 
-### Add text with HTML tags
+### Practice - Add text with HTML tags
+
+#### Your turn
 
 Add explanatory text to your movie app by using HTML tags in the main panel. 
 
@@ -555,7 +557,9 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Add image with the `img` tag
+### Practice - Add image with the `img` tag
+
+#### Your turn
 
 Now let's practice adding an image to a very simple app.  
 
@@ -1307,9 +1311,9 @@ knitr::include_graphics("images/themeselector.png")
 
 Next up you get to build an app with tabs and see how it looks with different shiny themes.
 
-## 4.4 Practice
+### Practice - Theming
 
-### Customize the appearance of your app with shinythemes
+#### Your turn
 
 Pick a theme and apply to the existing app. See 
 https://rstudio.github.io/shinythemes for more on theme options.
