@@ -1,6 +1,6 @@
 ---
 title: "1: Hello Shiny!"
-subtitle: Architecture of a shiny app
+subtitle: "Architecture of a shiny app"
 output: 
   learnr::tutorial:
     progressive: true
@@ -149,9 +149,7 @@ We load the data before `ui` and `server` definitions so that it can be used in 
 
 Alright, time for some practice!
 
-## 1.1 Practice
-
-### What's in an app?
+### Practice: What's in an app?
 
 ```{r mc-1}
 question("Which is not generally a part of the Shiny app architecture?",
@@ -359,9 +357,7 @@ Currently the main panel contains only one component, a plot output. We'll talk 
 
 Next, let's practice building an app UI!
 
-## 1.2 Practice
-
-### Extend the UI
+### Practice: Extend the UI
 
 We'll start with a simplified version of the app you saw in the previous exercise. In this app a `selectInput()` widget is used to allow the user to select which variables should be plotted on the `x` and `y` axes of the scatterplot.
 
@@ -521,7 +517,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Extend the UI further
+### Practice: Extend the UI further
 
 The potential variables the user can select for the `x` and `y` axes and `color` currently appear in the UI of the app the same way that they are spelled in the data frame header. However we might want to label them in a way that is more human readable. We can achieve this using named vectors for the `choices` argument, in the format of `"Human readable label" = "variable_name"`.
 
@@ -805,9 +801,7 @@ knitr::include_graphics("images/shinyAppfunction.png")
 Time to put this all into practice!
 
 
-## 1.3 Practice
-
-### Rules of server functions
+### Practice: Rules of server functions
 
 Which of the following is not true about server functions?
 
@@ -825,7 +819,7 @@ question("Which of the following is not true about server functions?",
 )
 ```
 
-### Fix it up
+### Practice: Fix it up
 
 Below is the code for the Shiny app we built earlier, however currently the code is broken. Specifically there are errors in the definition of the server function as well as in the `mainPanel` of the UI.
 

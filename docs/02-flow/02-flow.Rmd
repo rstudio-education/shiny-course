@@ -1,6 +1,6 @@
 ---
-title: "2: Inputs, outputs, and rendering functions"
-subtitle: "Relating inputs to rendering functions to outputs & build on one app over the chapter"
+title: "2: Reactive flow"
+subtitle: "Relating inputs to rendering functions to outputs"
 output: 
   learnr::tutorial:
     progressive: true
@@ -109,11 +109,7 @@ The user selects an input, this input goes through some expression in the server
 
 In a Shiny application, there’s no need to explictly describe the relationships between inputs and outputs and tell R what to do when each input changes, Shiny automatically handles these details for you.
 
-## 2.1 Practice
-
-Time for practice!
-
-### Building a reactive widget
+### Practice: Building a reactive widget
 
 As we saw in the previous sections, reactivity is established by linking an input with an output via a `render*()` function.
 
@@ -253,7 +249,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Dude, where's my plot?
+### Practice: Dude, where's my plot?
 
 The server function of this app builds two plots, `scatterplot` and `densityplot`, however the app only displays one.
 
@@ -537,9 +533,7 @@ HTML(paste0("The dataset has ", nrow(movies),
             "observations."))
 ```
 
-## 2.2 Practice
-
-### Add numericInput
+### Practice: Add numericInput
 
 The app below allows users to randomly select a desired number of movies, and displays some information on the selected movies in a tabular output. This table is created using a new function, `renderDataTable()`, but for now we will keep our focus on the `numericInput()` widget. We will also learn to define variables outside of the app so that they can be used in multiple spots to make our code more efficient.
 
@@ -681,7 +675,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### req
+### Practice: req
 
 The app below is the one you developed in the previous exercise. 
 
@@ -826,7 +820,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Select to selectize
+### Practice: Select to selectize
 
 The app below can be used to display movies from selected studios. Currently you can only choose one studio, but we'll modify it to allow for multiple selections. Additionally, there are 211 unique studios represented in this dataset, we need a better way to select than to scroll through such a long list, and we address that with the `selectize` option, which will suggest names of studios as you type them. 
 
@@ -967,7 +961,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Convert `dateInput` to `dateRangeInput`
+### Practice: Convert `dateInput` to `dateRangeInput`
 
 The app below can be used to display movies from a particular date onwards. Instead we would like to select movies between two given dates. Hence we need to convert the `dateInput` widget to `dateRangeInput`. This input will yield a vector (`input$date`) of length two: the first element is the start date and the second is the end date. 
 
@@ -1284,9 +1278,7 @@ caption = "Score ratio (audience / critics' scores) summary statistics by MPAA r
 Alright, it's time for you to practice `render*()` functions!
 
 
-## 2.3 Practice
-
-### Missing `renderPlot()`
+### Practice: Missing `renderPlot()`
 
 The following app is one you've seen before -- it creates a scatterplot of two variables selected by the user. However it's missing a crucial component, and hence the plot is not rendered.
 
@@ -1409,7 +1401,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Add `renderText()`
+### Practice: Add `renderText()`
 
 In this app, the user selects `x` and `y` variables for the scatterplot. We will extend the app to also include a `textOutput` which prints the correlation between the two selected variables as well some informational text.
 
@@ -1620,11 +1612,7 @@ output$moviestable <- renderDataTable({
 
 Note that the complete expression is wrapped in curly braces again. We do this for consistency in our code as well as to make debugging easier, if need be.
 
-## 2.4 Practice
-
-In the following four exercises you'll get to work with other interactive graphics and output functions!
-
-### Hovering
+### Practice - Hovering
 
 In addition to brushing, users can also interact with plots via hovering over them.
 
@@ -1765,7 +1753,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Displaying text outputs
+### Practice - Displaying text outputs
 
 The goal in this exercise is to develop an app where the user selects two variables and their relationship is visualized with a scatterplot, and averages of both variables are reported as well as the output of the linear regression predicting the variable on the y-axis from the variable in the x-axis. The code on the right only does some of these things.
 
@@ -1821,7 +1809,7 @@ ui <- fluidPage(
       
     )
   )
-
+)
 # Define server ----------------------------------------------------------------
  
 server <- function(input, output, session) {
@@ -1934,7 +1922,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Creating and formatting HTML output
+### Practice - Creating and formatting HTML output
 
 In the previous exercise you developed an app that reported averages of selected x and y variables as two separate outputs. An alternative approach would be to combine them into a single, multi-line output.
 
@@ -2099,7 +2087,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Download data with `downloadButton()`
+### Practice - Download data with `downloadButton()`
 
 In this app you get to specify the filetype and the variables included in the file you will download. For downloading from a Shiny app we use the `downloadHandler()` function in the server and `downloadButton()` or `downloadLink()` function in the UI.
 

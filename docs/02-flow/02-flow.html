@@ -13,7 +13,7 @@
 <meta name="progressive" content="true" />
 <meta name="allow-skip" content="true" />
 
-<title>2: Inputs, outputs, and rendering functions</title>
+<title>2: Reactive flow</title>
 
 <link rel="icon" type="image/png" href="images/favicon.ico"/>
 
@@ -397,12 +397,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>The user selects an input, this input goes through some expression in the server, and an output is rendered. Each time the user changes their input selection, the expression that generates the output will automatically re-execute, and the relevant output will be re-rendered based on the new value of the input.</p>
 <p>In a Shiny application, there’s no need to explictly describe the relationships between inputs and outputs and tell R what to do when each input changes, Shiny automatically handles these details for you.</p>
 </div>
-</div>
-<div id="section-practice" class="section level2">
-<h2>2.1 Practice</h2>
-<p>Time for practice!</p>
-<div id="section-building-a-reactive-widget" class="section level3">
-<h3>Building a reactive widget</h3>
+<div id="section-practice-building-a-reactive-widget" class="section level3">
+<h3>Practice: Building a reactive widget</h3>
 <p>As we saw in the previous sections, reactivity is established by linking an input with an output via a <code>render*()</code> function.</p>
 <div id="section-your-turn" class="section level4">
 <h4>Your turn</h4>
@@ -530,8 +526,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-dude-wheres-my-plot" class="section level3">
-<h3>Dude, where’s my plot?</h3>
+<div id="section-practice-dude-wheres-my-plot" class="section level3">
+<h3>Practice: Dude, where’s my plot?</h3>
 <p>The server function of this app builds two plots, <code>scatterplot</code> and <code>densityplot</code>, however the app only displays one.</p>
 <div id="section-your-turn-1" class="section level4">
 <h4>Your turn</h4>
@@ -767,11 +763,8 @@ Show solution
 <span id="section-cb9-2"><a href="#section-cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">HTML</span>(<span class="fu">paste0</span>(<span class="st">&quot;The dataset has &quot;</span>, <span class="fu">nrow</span>(movies), </span>
 <span id="section-cb9-3"><a href="#section-cb9-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;observations.&quot;</span>))</span></code></pre></div>
 </div>
-</div>
-<div id="section-practice-1" class="section level2">
-<h2>2.2 Practice</h2>
-<div id="section-add-numericinput" class="section level3">
-<h3>Add numericInput</h3>
+<div id="section-practice-add-numericinput" class="section level3">
+<h3>Practice: Add numericInput</h3>
 <p>The app below allows users to randomly select a desired number of movies, and displays some information on the selected movies in a tabular output. This table is created using a new function, <code>renderDataTable()</code>, but for now we will keep our focus on the <code>numericInput()</code> widget. We will also learn to define variables outside of the app so that they can be used in multiple spots to make our code more efficient.</p>
 <div id="section-your-turn-2" class="section level4">
 <h4>Your turn</h4>
@@ -898,8 +891,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-req" class="section level3">
-<h3>req</h3>
+<div id="section-practice-req" class="section level3">
+<h3>Practice: req</h3>
 <p>The app below is the one you developed in the previous exercise.</p>
 <ul>
 <li>Highlight the code and run it.</li>
@@ -979,8 +972,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-select-to-selectize" class="section level3">
-<h3>Select to selectize</h3>
+<div id="section-practice-select-to-selectize" class="section level3">
+<h3>Practice: Select to selectize</h3>
 <p>The app below can be used to display movies from selected studios. Currently you can only choose one studio, but we’ll modify it to allow for multiple selections. Additionally, there are 211 unique studios represented in this dataset, we need a better way to select than to scroll through such a long list, and we address that with the <code>selectize</code> option, which will suggest names of studios as you type them.</p>
 <div id="section-your-turn-4" class="section level4">
 <h4>Your turn</h4>
@@ -1106,8 +1099,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-convert-dateinput-to-daterangeinput" class="section level3">
-<h3>Convert <code>dateInput</code> to <code>dateRangeInput</code></h3>
+<div id="section-practice-convert-dateinput-to-daterangeinput" class="section level3">
+<h3>Practice: Convert <code>dateInput</code> to <code>dateRangeInput</code></h3>
 <p>The app below can be used to display movies from a particular date onwards. Instead we would like to select movies between two given dates. Hence we need to convert the <code>dateInput</code> widget to <code>dateRangeInput</code>. This input will yield a vector (<code>input$date</code>) of length two: the first element is the start date and the second is the end date.</p>
 <div id="section-your-turn-5" class="section level4">
 <h4>Your turn</h4>
@@ -1364,11 +1357,8 @@ Show solution
 </ul>
 <p>Alright, it’s time for you to practice <code>render*()</code> functions!</p>
 </div>
-</div>
-<div id="section-practice-2" class="section level2">
-<h2>2.3 Practice</h2>
-<div id="section-missing-renderplot" class="section level3">
-<h3>Missing <code>renderPlot()</code></h3>
+<div id="section-practice-missing-renderplot" class="section level3">
+<h3>Practice: Missing <code>renderPlot()</code></h3>
 <p>The following app is one you’ve seen before – it creates a scatterplot of two variables selected by the user. However it’s missing a crucial component, and hence the plot is not rendered.</p>
 <div id="section-your-turn-6" class="section level4">
 <h4>Your turn</h4>
@@ -1481,8 +1471,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-add-rendertext" class="section level3">
-<h3>Add <code>renderText()</code></h3>
+<div id="section-practice-add-rendertext" class="section level3">
+<h3>Practice: Add <code>renderText()</code></h3>
 <p>In this app, the user selects <code>x</code> and <code>y</code> variables for the scatterplot. We will extend the app to also include a <code>textOutput</code> which prints the correlation between the two selected variables as well some informational text.</p>
 <div id="section-your-turn-7" class="section level4">
 <h4>Your turn</h4>
@@ -1659,12 +1649,8 @@ Show solution
 </ul>
 <p>Note that the complete expression is wrapped in curly braces again. We do this for consistency in our code as well as to make debugging easier, if need be.</p>
 </div>
-</div>
-<div id="section-practice-3" class="section level2">
-<h2>2.4 Practice</h2>
-<p>In the following four exercises you’ll get to work with other interactive graphics and output functions!</p>
-<div id="section-hovering" class="section level3">
-<h3>Hovering</h3>
+<div id="section-practice---hovering" class="section level3">
+<h3>Practice - Hovering</h3>
 <p>In addition to brushing, users can also interact with plots via hovering over them.</p>
 <div id="section-your-turn-8" class="section level4">
 <h4>Your turn</h4>
@@ -1795,8 +1781,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-displaying-text-outputs" class="section level3">
-<h3>Displaying text outputs</h3>
+<div id="section-practice---displaying-text-outputs" class="section level3">
+<h3>Practice - Displaying text outputs</h3>
 <p>The goal in this exercise is to develop an app where the user selects two variables and their relationship is visualized with a scatterplot, and averages of both variables are reported as well as the output of the linear regression predicting the variable on the y-axis from the variable in the x-axis. The code on the right only does some of these things.</p>
 <div id="section-your-turn-9" class="section level4">
 <h4>Your turn</h4>
@@ -1845,7 +1831,7 @@ Show solution
 <span id="section-cb29-35"><a href="#section-cb29-35" aria-hidden="true" tabindex="-1"></a>      </span>
 <span id="section-cb29-36"><a href="#section-cb29-36" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="section-cb29-37"><a href="#section-cb29-37" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="section-cb29-38"><a href="#section-cb29-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="section-cb29-38"><a href="#section-cb29-38" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="section-cb29-39"><a href="#section-cb29-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Define server ----------------------------------------------------------------</span></span>
 <span id="section-cb29-40"><a href="#section-cb29-40" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="section-cb29-41"><a href="#section-cb29-41" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
@@ -1954,8 +1940,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-creating-and-formatting-html-output" class="section level3">
-<h3>Creating and formatting HTML output</h3>
+<div id="section-practice---creating-and-formatting-html-output" class="section level3">
+<h3>Practice - Creating and formatting HTML output</h3>
 <p>In the previous exercise you developed an app that reported averages of selected x and y variables as two separate outputs. An alternative approach would be to combine them into a single, multi-line output.</p>
 <p>Combine the values calculated in the previous exercise as described below to create a customized HTML output.</p>
 <div id="section-your-turn-10" class="section level4">
@@ -2109,8 +2095,8 @@ Show solution
 </details>
 </div>
 </div>
-<div id="section-download-data-with-downloadbutton" class="section level3">
-<h3>Download data with <code>downloadButton()</code></h3>
+<div id="section-practice---download-data-with-downloadbutton" class="section level3">
+<h3>Practice - Download data with <code>downloadButton()</code></h3>
 <p>In this app you get to specify the filetype and the variables included in the file you will download. For downloading from a Shiny app we use the <code>downloadHandler()</code> function in the server and <code>downloadButton()</code> or <code>downloadLink()</code> function in the UI.</p>
 <p>Download the selected data with <code>downloadButton()</code> using instructions help files to figure out exactly how it works</p>
 <div id="section-your-turn-11" class="section level4">
@@ -2322,8 +2308,8 @@ learnr:::store_exercise_setup_chunk("__setup__", c("library(learnr)", "library(s
 
 <!-- begin doc-metadata -->
 <div id="doc-metadata">
-<h2 class="title toc-ignore" style="display:none;">2: Inputs, outputs, and rendering functions</h2>
-<h3 class="subtitle"><em>Relating inputs to rendering functions to outputs &amp; build on one app over the chapter</em></h3>
+<h2 class="title toc-ignore" style="display:none;">2: Reactive flow</h2>
+<h3 class="subtitle"><em>Relating inputs to rendering functions to outputs</em></h3>
 </div>
 <!-- end doc-metadata -->
 

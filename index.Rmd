@@ -22,9 +22,12 @@ knitr::opts_chunk$set(
 
 This is a short course that will introduce you to Shiny. 
 
-### How it works
-
 The course is organized into four modules, which you can access with the navigation bar above. 
+
+- Module 1: Hello Shiny! - Architecture of a shiny app
+- Module 2: Reactive flow - Inputs to rendering functions to outputs
+- Module 3: Reactivity essentials - Diving deeper into reactive programming
+- Module 4: Customizing UI - Understanding how to build a user interface
 
 ### Getting practice
 

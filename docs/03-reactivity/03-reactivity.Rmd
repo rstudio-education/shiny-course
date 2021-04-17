@@ -1,6 +1,6 @@
 ---
-title: "3: Reactive programming"
-subtitle:
+title: "3: Reactivity essentials"
+subtitle: "Diving deeper into reactive programming"
 output: 
   learnr::tutorial:
     progressive: true
@@ -198,9 +198,7 @@ Using simple HTML we add some decoration to the text, and finally wrap the whole
 
 Then on the ui side, we use the counterpart `uiOutput()` function to lay out the text on the app.
 
-## 3.1 Practice
-
-### Add reactive data frame
+### Practice - Add reactive data frame
 
 We ended the previous chapter with an app that allows you to download a data file with selected variables from the `movies` dataset. We will now extend this app by adding a table output of the selected data as well. Given that the same dataset will be used in two outputs, it makes sense to make our code more efficient by using a reactive data frame.
 
@@ -380,7 +378,7 @@ shinyApp(ui = ui, server = server)
 </details>
 
 
-### Identify reactive objects
+### Practice: Identify reactive objects
 
 ```{r mc-2, echo=FALSE}
 question("The `movies_selected()` reactive expression from the previous exercise is a...",
@@ -439,9 +437,7 @@ knitr::include_graphics("images/reactlog.png")
 
 This visualization also makes it easy to view the inputs the reactive expression depends on and the output that depend on it.
 
-## 3.2 Practice
-
-### Find missing reactives
+### Practice - Find missing reactives
 
 In the following app code there are a number of spots where reactives are not used properly.
 
@@ -693,7 +689,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Find inconsistencies in what the app is reporting
+### Practice - Find inconsistencies in what the app is reporting
 
 In this exercise we go on a hunt for mismatched used of reactives.
 
@@ -1013,13 +1009,11 @@ A calculation is a block of code where you don’t care about whether the code a
 
 An action is where you care very much that the code executes, and there is no return value, there are only side effects. For these we use `observe()`.
 
-## 3.3 Practice
+### Practice - Reactives vs. observers
 
 Next you get to assess your understanding of reactives vs. observers.  
 
 You'll add a `reactiveValues()` element to the app. Define observers and their side effects, and how these compare to reactives.
-
-### Test understanding of the `reactiveValues()` function 
 
 #### Your turn
 
@@ -1118,9 +1112,7 @@ And where does isolate fit in all this?
 - `observeEvent()` is used to perform an action in response to an event
 - `eventReactive()` is used to create a calculated value that only updates in response to an event
 
-## 3.4 Practice
-
-### Stop with `isolate()`
+### Practice - Stop with `isolate()`
 
 In the following app, the user, in addition to controlling which variables are plotted, can adjust the size and transparency of points and define the plot title.
 
@@ -1340,7 +1332,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Delay with `eventReactive()`
+### Practice - Delay with `eventReactive()`
 
 The following app has the same starter code as the previous exercise.
 
@@ -1569,7 +1561,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Trigger with `observeEvent()`
+### Practice - Trigger with `observeEvent()`
 
 In this app we want two things to happen when an action button is clicked: 
 
@@ -1708,7 +1700,7 @@ shinyApp(ui = ui, server = server)
 
 </details>
 
-### Difference between `eventReactive()` and `observeEvent()`
+### Practice - Difference between `eventReactive()` and `observeEvent()`
 
 ```{r mc-3, echo=FALSE}
 question("Which of the following is false?",
@@ -1872,9 +1864,7 @@ shinyApp(ui, server)
 
 Missing the parentheses is a common error when working with reactives. So add this to your list! When developing Shiny apps, be wary of missing commas, and of missing parentheses when calling reactive expressions.
 
-## 3.5 Practice
-
-### What's wrong?
+### Practice - What's wrong?
 
 #### Your turn
 
