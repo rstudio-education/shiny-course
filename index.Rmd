@@ -88,4 +88,4 @@ Time to give this Shiny course a whirl!
 
 [RStudio Community](https://community.rstudio.com/c/shiny/8) is a great place to ask any questions related to Shiny. 
 
-If you have any suggestions for improvement (bug reports, typos, something unclear that should be revised, etc.) for this particular tutorial, you can open an issue in the [tutorial repo](https://rstudio-education.github.io/shiny-course/).
+If you have any suggestions for improvement (bug reports, typos, something unclear that should be revised, etc.) for this particular tutorial, you can open an issue in the [tutorial repo](https://github.com/rstudio-education/shiny-course/).
