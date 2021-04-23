@@ -18,8 +18,6 @@ runtime: shiny_prerendered
 library(learnr)
 library(shiny)
 library(tidyverse)
-library(usethis)
-library(devtools)
 library(rsconnect)
 
 knitr::opts_chunk$set(
@@ -160,12 +158,12 @@ question("Which is not generally a part of the Shiny app architecture?",
   answer("User interface"),
   answer("Server function"),
   answer("A function that creates Shiny app objects"),
-  allow_retry = FALSE,
+  allow_retry = TRUE,
   random_answer_order = TRUE
 )
 ```
 
-### First peek under the hood
+### Practice: First peek under the hood
 
 Below you can see the complete code to reproduce the app we introduced in the previous section. Now you get to interact with the app yourself, and make small adjustments to it. 
 
@@ -183,10 +181,13 @@ I've created an RStudio Cloud Project for you to test drive this code. Click the
 #### Your turn
 
 - Once your RStudio Cloud Project is open to the script `app.R`, click <img alt="Run App" src="images/run-app.png" height = "25px"> to run the code and generate the app.
-- Play with the input sliders and observe how the output changes.
-- Change the `selected` choice for the `y` input to `imdb_rating` and for the `x` input to `imdb_num_votes` and rerun the app.
+- Play with the input selectors for the Y-axis and the X-axis and observe how the output changes.
+- Close the app by closing the pop-up window or clicking on the red Stop button in the viewer.
+- Locate the relevant lines of code in `app.R` that build the selector widget for the Y-axis. This is in a `selectInput()` function starting on Line 20, underneath the comment `# Select variable for y-axis`. Note that this function takes four arguments: `inputId`, `label`, `choices`, and `selected`. We'll discuss what each of these mean in detail shortly. For now, change the `selected` argument to `imdb_rating`, save your changes, and run the app again by clicking on <img alt="Run App" src="images/run-app.png" height = "25px">. What changed?
+  - If you get an error when you try to rerun the app, you can either try to debug the issue by tracing back your steps or delete everything in `app.R` and copy and paste the code below into `app.R`. This will get you back to your starting point. You can use this "start over" approach for any of the exercises in this tutorial.
+- Now locate the relevant lines of code in `app.R` that build the selector widget for the X-axis. This is also in a `selectInput()` function, starting on Line 27, underneath the comment `# Select variable for x-axis`. Change the `selected` argument to `imdb_rating` as well, save your changes, and run the app again. What changed?
 
-```{r ex-1-1-slider, eval = FALSE, echo = TRUE}
+```{r ex-1-1-selector, eval = FALSE, echo = TRUE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -364,17 +365,20 @@ We'll start with a simplified version of the app you saw in the previous exercis
 The `selectInput()` function has the following arguments: 
 
 - an `inputId` that is used to refer to the input parameter when building the scatterplot, 
-- a list of `choices` to pick from, 
+- a list of `choices` to pick from (which must match variable names in the data frame), 
 - and a `selected` choice for when the app first launches. 
-
-Note that `choices` takes a named vector, and the name rather than the value (which must match variable names in the data frame) is displayed to the user. 
-
 
 #### Your turn
 
-- Modify the Shiny app code below, and add a new `selectInput` widget to color the points by a choice of the following variables: `"title_type"`, `"genre"`, `"mpaa_rating"`, `"critics_rating"`, `"audience_rating"`.
+Modify the Shiny app code in `app.R` / shown below: 
 
-- Make the default selection `"mpaa_rating"`.
+- In the `ui`:
+  - Add a new `selectInput` widget to color the points by a choice of the following variables: `"title_type"`, `"genre"`, `"mpaa_rating"`, `"critics_rating"`, `"audience_rating"`.
+  - Make the default selection `"mpaa_rating"`.
+  - Use `"z"` as the `inputId`` can be whatever you like,`.
+
+- In the `server`:
+  - Set the color argument in `ggplot()` aesthetic mappings to `input$z`.
 
 :::proj
 
@@ -557,24 +561,27 @@ ui <- fluidPage(
       selectInput(inputId = "y", 
                   label = "Y-axis:",
                   choices = c(___ = "imdb_rating", 
-                                 ___ = "imdb_num_votes", 
-                                 ___ = "critics_score", 
-                                 ___ = "audience_score", 
-                                 ___ = "runtime"), 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
                   selected = "audience_score"),
       
       # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
                   choices = c(___ = "imdb_rating", 
-                                 ___ = "imdb_num_votes", 
-                                 ___ = "critics_score", 
-                                 ___ = "audience_score", 
-                                 ___ = "runtime"), 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
                   selected = "critics_score"),
       
       # Select variable for color
-      selectInput(___)
+      selectInput(inputId = "z", 
+                  label = "Color:",
+                  choices = ___, 
+                  selected = ___)
       
     ),
     
@@ -639,22 +646,24 @@ ui <- fluidPage(
       # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
+                  choices = c(
+                    "IMDB rating"          = "imdb_rating", 
+                    "IMDB number of votes" = "imdb_num_votes", 
+                    "Critics score"        = "critics_score", 
+                    "Audience score"       = "audience_score", 
+                    "Runtime"              = "runtime"), 
                   selected = "critics_score"),
       
       # Select variable for color
       # Select variable for color
       selectInput(inputId = "z", 
                   label = "Color by:",
-                  choices = c("Title type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA rating" = "mpaa_rating", 
-                              "Critics rating" = "critics_rating", 
-                              "Audience rating" = "audience_rating"),
+                  choices = c(
+                    "Title type" = "title_type", 
+                    "Genre" = "genre", 
+                    "MPAA rating" = "mpaa_rating", 
+                    "Critics rating" = "critics_rating", 
+                    "Audience rating" = "audience_rating"),
                   selected = "mpaa_rating")
       
     ),
@@ -720,7 +729,7 @@ The server function accesses inputs selected by the user to perform computations
 
 The server function can take on one more argument, `session`, which is an environment that can be used to access information and functionality relating to the session. However this concept is beyond the scope of this tutorial, so for now we'll stick to server functions that only have input and output arguments.
 
-### output
+### `output`
 
 Our simple app had only one output -- a plot. So our server function contains the logic necessary to build this plot.
 
@@ -778,6 +787,67 @@ Shiny knows to match these two together as they use the same `outputID`, scatter
 
 In the following exercises you'll get a chance to work with other render/output function pairs to add more elements to your app.
 
+### Practice: Matching inputs and outputs
+
+Here is a simple Shiny app. 
+Try entering some text and observe how the text is displayed back to you after a short pause.
+
+---
+
+```{r, eval = TRUE, echo = FALSE}
+fluidPage(
+  textInput(inputId = "custom_text", label = "Input some text here:"),
+  strong("Text is shown below:"),
+  textOutput(outputId = "user_text")
+)
+```
+
+```{r, context = "server", eval = TRUE}
+output$user_text <- renderText({ input$custom_text })
+```
+
+---
+
+The code for this app is given below, with a few pieces missing (indicated with `___`). Each of the blanks are numbered, e.g. (`[1]`, `[2]`, etc.)
+
+```{r eval = FALSE, echo = TRUE}
+library(shiny)
+
+ui <- fluidPage(
+
+  textInput(
+    inputId = "custom_text",
+    label = "_[1]_"
+  ),
+
+  strong("Text is shown below:"),
+
+  _[2]_(outputId = "_[3]_")
+
+)
+
+server <- function(input, output, session){
+
+  output$user_text <- renderText({ input$_[4]_ })
+
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+```{r mc-2}
+question("Which of the following is false?",
+  answer('`[1]` should be `"Input some text here:"`',
+         message = "Take a look at the app, what text is shown to the user above the text input area?"),
+  answer('`[2]` should be `textOutput`', 
+         message = "Check out the Shiny cheatsheet for pairs of input and output functions"),
+  answer('`[3]` should be `"custom_text"`', correct = TRUE),
+  answer('`[4]` should be `"custom_text"`',
+         message = "What is the ID of the input that should be rendered?"),
+  allow_retry = TRUE
+)
+```
+
 ### Reactivity
 
 Let's also briefly discuss reactivity. 
@@ -805,7 +875,7 @@ Time to put this all into practice!
 
 Which of the following is not true about server functions?
 
-```{r mc-2}
+```{r mc-3}
 question("Which of the following is not true about server functions?",
   answer("Server functions should include a call to `runApp()`",
     correct = TRUE,
@@ -814,7 +884,7 @@ question("Which of the following is not true about server functions?",
   answer("Objects to be displayed should be saved to `output$`"),
   answer("Reactive objects should be built with `render*()` functions"),
   answer("Input values should be referred to with `input$`"),
-  allow_retry = FALSE,
+  allow_retry = TRUE,
   random_answer_order = TRUE
 )
 ```
@@ -825,8 +895,11 @@ Below is the code for the Shiny app we built earlier, however currently the code
 
 #### Your turn 
 
-- Review the app and identify errors in the code
-- Fix the errors and test out the app
+- Review the app and identify errors in the code. 
+  - Hint: Refer back to the rules of server functions.
+- Do the render functions match the output functions? If not, make the appropriate change and try running the app. Are there any remaining errors?
+- Are the inputs referred to using the correct syntax? If not, make the appropriate change and try running the app. Are there any remaining errors?
+- Are the outputs referred to using the correct names? If not, make the appropriate change and try running the app. Are there any remaining errors?
 
 :::proj
 
@@ -908,12 +981,12 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   output$scatterplot <- renderTable({
-    ggplot(data = movies, aes_string(
-      x = x, y = y,
-      color = z
-    )) +
+
+    ggplot(data = movies, aes_string(x = x, y = y, color = z)) +
       geom_point()
+
   })
+
 }
 
 # Create a Shiny app object ----------------------------------------------------
@@ -993,10 +1066,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   output$scatterplot <- renderPlot({
-    ggplot(data = movies, aes_string(
-      x = input$x, y = input$y,
-      color = input$z
-    )) +
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point()
   })
 }
@@ -1049,7 +1119,7 @@ knitr::include_graphics("images/recap-4.png")
 
 I often think of the UI as containing syntax specific to Shiny, and the server as containing R code you might already be familiar with -- with some Shiny functions added to achieve reactivity.
 
-### Change display
+### Tip: Change display
 
 In this tutorial you will be developing your apps in RStudio Cloud projects, but once you're done with the tutorial you might consider developing your apps in the RStudio IDE, which has some some handy-dandy functionality for running and viewing your apps. 
 
@@ -1059,7 +1129,7 @@ RStudio will automatically recognize R scripts that contain `ui` and `server` co
 knitr::include_graphics("images/recap-5.png")
 ```
 
-### Close an app
+### Tip: Close an app
 
 When you are done with an app, you can terminate the session by clicking the red stop button in your viewer pane.
 
