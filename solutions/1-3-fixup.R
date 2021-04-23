@@ -60,7 +60,7 @@ ui <- fluidPage(
 
     # Output: Show scatterplot
     mainPanel(
-      plotOutput(outputId = "scatterPlot")
+      plotOutput(outputId = "scatterplot")
     )
   )
 )
@@ -68,11 +68,8 @@ ui <- fluidPage(
 # Define server ----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  output$scatterplot <- renderTable({
-    ggplot(data = movies, aes_string(
-      x = x, y = y,
-      color = z
-    )) +
+  output$scatterplot <- renderPlot({
+    ggplot(data = movies, aes_string(x = input$x, y = input$y, color = input$z)) +
       geom_point()
   })
 }

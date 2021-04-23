@@ -35,7 +35,7 @@ ui <- fluidPage(
       
     )
   )
-
+)
 # Define server ----------------------------------------------------------------
  
 server <- function(input, output, session) {

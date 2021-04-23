@@ -19,33 +19,28 @@ ui <- fluidPage(
       # Select variable for y-axis
       selectInput(inputId = "y", 
                   label = "Y-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
+                  choices = c(___ = "imdb_rating", 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
                   selected = "audience_score"),
       
       # Select variable for x-axis
       selectInput(inputId = "x", 
                   label = "X-axis:",
-                  choices = c("IMDB rating"          = "imdb_rating", 
-                              "IMDB number of votes" = "imdb_num_votes", 
-                              "Critics score"        = "critics_score", 
-                              "Audience score"       = "audience_score", 
-                              "Runtime"              = "runtime"), 
+                  choices = c(___ = "imdb_rating", 
+                              ___ = "imdb_num_votes", 
+                              ___ = "critics_score", 
+                              ___ = "audience_score", 
+                              ___ = "runtime"), 
                   selected = "critics_score"),
       
       # Select variable for color
-      # Select variable for color
       selectInput(inputId = "z", 
-                  label = "Color by:",
-                  choices = c("Title type" = "title_type", 
-                              "Genre" = "genre", 
-                              "MPAA rating" = "mpaa_rating", 
-                              "Critics rating" = "critics_rating", 
-                              "Audience rating" = "audience_rating"),
-                  selected = "mpaa_rating")
+                  label = "Color:",
+                  choices = ___, 
+                  selected = ___)
       
     ),
     

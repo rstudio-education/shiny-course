@@ -3,7 +3,7 @@ library(tidyverse)
 
 # Extract solutions ------------------------------------------------------------
 
-extract_solutions <- function(rmd, out_dir) {
+extract_solutions <- function(rmd, out_dir = "solutions") {
 
   tutorial <- parse_rmd(rmd)
   solutions <- rmd_select(tutorial, by_label("*-solution"))
@@ -17,29 +17,17 @@ extract_solutions <- function(rmd, out_dir) {
 
 }
 
-extract_solutions(
-  rmd = "01-hello/01-hello.Rmd",
-  out_dir = "01-hello/solutions"
-)
+extract_solutions(rmd = "01-hello/01-hello.Rmd")
 
-extract_solutions(
-  rmd = "02-flow/02-flow.Rmd",
-  out_dir = "02-flow/solutions"
-)
+extract_solutions(rmd = "02-flow/02-flow.Rmd")
 
-extract_solutions(
-  rmd = "03-reactivity/03-reactivity.Rmd",
-  out_dir = "03-reactivity/solutions"
-)
+extract_solutions(rmd = "03-reactivity/03-reactivity.Rmd")
 
-extract_solutions(
-  rmd = "04-ui/04-ui.Rmd",
-  out_dir = "04-ui/solutions"
-)
+extract_solutions(rmd = "04-ui/04-ui.Rmd")
 
 # Extract exercises ------------------------------------------------------------
 
-extract_exercises <- function(rmd, out_dir) {
+extract_exercises <- function(rmd, out_dir = "exercises") {
 
   tutorial <- parse_rmd(rmd)
   exercises <- rmd_select(tutorial, by_label("ex-*") & !by_label("*-solution"))
@@ -52,22 +40,10 @@ extract_exercises <- function(rmd, out_dir) {
 
 }
 
-extract_exercises(
-  rmd = "01-hello/01-hello.Rmd",
-  out_dir = "01-hello/exercises"
-)
+extract_exercises(rmd = "01-hello/01-hello.Rmd")
 
-extract_exercises(
-  rmd = "02-flow/02-flow.Rmd",
-  out_dir = "02-flow/exercises"
-)
+extract_exercises(rmd = "02-flow/02-flow.Rmd")
 
-extract_exercises(
-  rmd = "03-reactivity/03-reactivity.Rmd",
-  out_dir = "03-reactivity/exercises"
-)
+extract_exercises(rmd = "03-reactivity/03-reactivity.Rmd")
 
-extract_exercises(
-  rmd = "04-ui/04-ui.Rmd",
-  out_dir = "04-ui/exercises"
-)
+extract_exercises(rmd = "04-ui/04-ui.Rmd")
