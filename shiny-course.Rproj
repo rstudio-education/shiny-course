@@ -15,3 +15,4 @@ LaTeX: pdfLaTeX
 StripTrailingWhitespace: Yes
 
 BuildType: Website
+DisableExecuteRprofile: Yes

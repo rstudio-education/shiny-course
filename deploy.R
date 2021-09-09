@@ -2,7 +2,7 @@ library(rsconnect)
 
 # Module 1 ---------------------------------------------------------------------
 
-deployDoc(
+rsconnect::deployDoc(
   doc = "01-hello/01-hello.Rmd",
   account = "minecr",
   forceUpdate = TRUE
@@ -10,14 +10,14 @@ deployDoc(
 
 # Module 2 ---------------------------------------------------------------------
 
-deployDoc(
-  doc = "02-flow.Rmd/02-flow.Rmd",
+rsconnect::deployDoc(
+  doc = "02-flow/02-flow.Rmd",
   forceUpdate = TRUE
 )
 
 # Module 3 ---------------------------------------------------------------------
 
-deployDoc(
+rsconnect::deployDoc(
   doc = "03-reactivity/03-reactivity.Rmd",
   account = "minecr",
   forceUpdate = TRUE
@@ -25,7 +25,7 @@ deployDoc(
 
 # Module 4 ---------------------------------------------------------------------
 
-deployDoc(
+rsconnect::deployDoc(
   doc = "04-ui/04-ui.Rmd",
   account = "minecr",
   forceUpdate = TRUE
