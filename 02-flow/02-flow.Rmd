@@ -514,7 +514,7 @@ knitr::include_graphics("images/app-datatable-checked.png")
 and box **unchecked**: 
 
 ```{r, out.width = "80%"}
-knitr::include_graphics("images/app-datatable-checked.png")
+knitr::include_graphics("images/app-datatable-unchecked.png")
 ```
 
 ### Scoping 
