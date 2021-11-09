@@ -375,7 +375,8 @@ Modify the Shiny app code in `app.R` / shown below:
 - In the `ui`:
   - Add a new `selectInput` widget to color the points by a choice of the following variables: `"title_type"`, `"genre"`, `"mpaa_rating"`, `"critics_rating"`, `"audience_rating"`.
   - Make the default selection `"mpaa_rating"`.
-  - Use `"z"` as the `inputId`` can be whatever you like,`.
+  - Use `"z"` as the `inputId`.
+  - `label` can be whatever you like.
 
 - In the `server`:
   - Set the color argument in `ggplot()` aesthetic mappings to `input$z`.
