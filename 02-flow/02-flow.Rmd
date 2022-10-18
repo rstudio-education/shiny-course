@@ -478,7 +478,7 @@ mainPanel(
   # Show scatterplot
   plotOutput(outputId = "scatterplot"), 
   # Show data table
-  dataTableOutput(outputId = "movestable")
+  dataTableOutput(outputId = "moviestable")
 )
 ```
 
