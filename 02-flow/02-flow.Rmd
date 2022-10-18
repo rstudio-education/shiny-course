@@ -1574,7 +1574,7 @@ Let's go through these steps one by one.
 
 ### 1. **ui:** Add functionality to `plotOutput` to select points via brushing.
 
-First is the brushing capability added to the `plotOutput()` function. Previously we've only passed one argument to the `plotOutput()` function. This time we're making use its additional arguments, one of which is `brush`.
+First is the brushing capability added to the `plotOutput()` function. Previously we've only passed one argument to the `plotOutput()` function. This time we're making use of its additional arguments, one of which is `brush`.
 
 ```{r, eval= FALSE, include = FALSE}
 # Show scatterplot with brushing capability 
