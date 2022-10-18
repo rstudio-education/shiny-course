@@ -46,7 +46,7 @@ server <- function(input, output, session) {
   # Create text output stating the correlation between the two ploted 
   output$correlation <- ___
 
-  s}
+}
 
 # Create the Shiny app object --------------------------------------------------
 
