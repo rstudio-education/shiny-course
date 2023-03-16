@@ -478,7 +478,7 @@ mainPanel(
   # Show scatterplot
   plotOutput(outputId = "scatterplot"), 
   # Show data table
-  dataTableOutput(outputId = "movestable")
+  dataTableOutput(outputId = "moviestable")
 )
 ```
 
@@ -761,7 +761,7 @@ shinyApp(ui = ui, server = server)
 
 See the following code chunk for the solution to the exercise above. 
 
-```{r ex-2-2b-req-solution, echo = FALSE, eval = FALSE}
+```{r ex-2-2b-req-solution, echo = TRUE, eval = FALSE}
 # Load packages ----------------------------------------------------------------
 
 library(shiny)
@@ -1574,7 +1574,7 @@ Let's go through these steps one by one.
 
 ### 1. **ui:** Add functionality to `plotOutput` to select points via brushing.
 
-First is the brushing capability added to the `plotOutput()` function. Previously we've only passed one argument to the `plotOutput()` function. This time we're making use its additional arguments, one of which is `brush`.
+First is the brushing capability added to the `plotOutput()` function. Previously we've only passed one argument to the `plotOutput()` function. This time we're making use of its additional arguments, one of which is `brush`.
 
 ```{r, eval= FALSE, include = FALSE}
 # Show scatterplot with brushing capability 
